@@ -40,6 +40,7 @@ scanRouter.post('/', async (req, res, next) => {
 
     // Store in database
     let site = await db.getSiteByUrl(url);
+    let siteKey: string;
 
     if (!site) {
       // Create new site
@@ -51,10 +52,11 @@ scanRouter.post('/', async (req, res, next) => {
         scanCount: 1,
         currentScore: result.score,
         status: 'active',
-      });
-      site = { _key: siteDoc._key, ...siteDoc } as any;
+      } as any);
+      siteKey = siteDoc._key;
     } else {
       // Update existing site
+      siteKey = site._key;
       await db.sites.update(site._key, {
         lastScanned: new Date(),
         scanCount: (site.scanCount || 0) + 1,
@@ -65,7 +67,7 @@ scanRouter.post('/', async (req, res, next) => {
 
     // Store scan
     const scanDoc = await db.scans.save({
-      siteKey: site._key,
+      siteKey,
       timestamp: result.timestamp,
       score: result.score,
       violations: result.violations.length,
@@ -75,14 +77,14 @@ scanRouter.post('/', async (req, res, next) => {
       wcagLevel,
       duration: result.duration,
       userAgent: result.metadata.userAgent,
-    });
+    } as any);
 
     // Store violations
     for (const violation of result.violations) {
       for (const node of violation.nodes) {
         await db.violations.save({
           scanKey: scanDoc._key,
-          siteKey: site._key,
+          siteKey,
           wcagCriterion: violation.wcag[0] || 'unknown',
           wcagLevel: wcagLevel,
           impact: violation.impact,
@@ -92,7 +94,7 @@ scanRouter.post('/', async (req, res, next) => {
           html: node.html,
           timestamp: new Date(),
           fixed: false,
-        });
+        } as any);
       }
     }
 

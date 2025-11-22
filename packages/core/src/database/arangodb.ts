@@ -186,9 +186,10 @@ export class ArangoDBService {
     }
   }
 
-  private getWCAGCriteriaData(): Partial<WCAGCriterion>[] {
+  private getWCAGCriteriaData(): WCAGCriterion[] {
     return [
       {
+        _key: '1_1_1',
         criterion: '1.1.1',
         level: 'A',
         principle: 'perceivable',
@@ -200,6 +201,7 @@ export class ArangoDBService {
         failures: ['F3', 'F13', 'F20', 'F30', 'F38', 'F39', 'F65', 'F67', 'F71', 'F72'],
       },
       {
+        _key: '1_3_1',
         criterion: '1.3.1',
         level: 'A',
         principle: 'perceivable',
@@ -211,6 +213,7 @@ export class ArangoDBService {
         failures: ['F2', 'F33', 'F34', 'F42', 'F43', 'F46', 'F48', 'F68', 'F87', 'F90', 'F91', 'F92'],
       },
       {
+        _key: '1_4_3',
         criterion: '1.4.3',
         level: 'AA',
         principle: 'perceivable',
@@ -222,6 +225,7 @@ export class ArangoDBService {
         failures: ['F24', 'F83'],
       },
       {
+        _key: '2_1_1',
         criterion: '2.1.1',
         level: 'A',
         principle: 'operable',
@@ -233,6 +237,7 @@ export class ArangoDBService {
         failures: ['F54', 'F55', 'F42'],
       },
       {
+        _key: '2_4_1',
         criterion: '2.4.1',
         level: 'A',
         principle: 'operable',
@@ -244,6 +249,7 @@ export class ArangoDBService {
         failures: ['F'],
       },
       {
+        _key: '2_4_2',
         criterion: '2.4.2',
         level: 'A',
         principle: 'operable',
@@ -255,6 +261,7 @@ export class ArangoDBService {
         failures: ['F25'],
       },
       {
+        _key: '3_1_1',
         criterion: '3.1.1',
         level: 'A',
         principle: 'understandable',
@@ -266,6 +273,7 @@ export class ArangoDBService {
         failures: [],
       },
       {
+        _key: '3_2_3',
         criterion: '3.2.3',
         level: 'AA',
         principle: 'understandable',
@@ -277,6 +285,7 @@ export class ArangoDBService {
         failures: ['F66'],
       },
       {
+        _key: '4_1_1',
         criterion: '4.1.1',
         level: 'A',
         principle: 'robust',
@@ -288,6 +297,7 @@ export class ArangoDBService {
         failures: ['F70', 'F77'],
       },
       {
+        _key: '4_1_2',
         criterion: '4.1.2',
         level: 'A',
         principle: 'robust',

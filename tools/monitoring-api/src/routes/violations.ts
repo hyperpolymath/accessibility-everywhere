@@ -19,6 +19,8 @@ violationsRouter.post('/', async (req, res, next) => {
 
     // Get or create site
     let site = await db.getSiteByUrl(url);
+    let siteKey: string;
+
     if (!site) {
       const urlObj = new URL(url);
       const siteDoc = await db.sites.save({
@@ -29,13 +31,15 @@ violationsRouter.post('/', async (req, res, next) => {
         scanCount: 0,
         currentScore: 0,
         status: 'active',
-      });
-      site = { _key: siteDoc._key } as any;
+      } as any);
+      siteKey = siteDoc._key;
+    } else {
+      siteKey = site._key;
     }
 
     // Store violation
     await db.violations.save({
-      siteKey: site._key,
+      siteKey,
       scanKey: '', // No scan key for direct reports
       wcagCriterion: violation.wcagCriterion || 'unknown',
       wcagLevel: violation.wcagLevel || 'AA',
@@ -46,7 +50,7 @@ violationsRouter.post('/', async (req, res, next) => {
       html: violation.html || '',
       timestamp: new Date(timestamp || Date.now()),
       fixed: false,
-    });
+    } as any);
 
     res.json({
       success: true,
@@ -99,7 +103,6 @@ violationsRouter.patch('/:violationId/fixed', async (req, res, next) => {
 
     await db.violations.update(violationId, {
       fixed: true,
-      fixedAt: new Date(),
     });
 
     res.json({

@@ -29,10 +29,16 @@ dashboardRouter.get('/:orgId', async (req, res, next) => {
         ? sites.reduce((sum, site) => sum + site.currentScore, 0) / totalSites
         : 0;
 
-    const totalViolations = await db.violations.byExample({
-      siteKey: sites.map(s => s._key),
-      fixed: false,
-    }).then(cursor => cursor.count());
+    // Count total violations across all sites
+    let totalViolations = 0;
+    for (const site of sites) {
+      const cursor = await db.violations.byExample({
+        siteKey: site._key,
+        fixed: false,
+      });
+      const count = cursor.count ?? 0;
+      totalViolations += count;
+    }
 
     res.json({
       success: true,
@@ -44,7 +50,7 @@ dashboardRouter.get('/:orgId', async (req, res, next) => {
         stats: {
           totalSites,
           averageScore: Math.round(averageScore),
-          totalViolations: totalViolations.count,
+          totalViolations,
         },
         sites: sites.map(site => ({
           domain: site.domain,

@@ -111,7 +111,7 @@ export class AccessibilityScanner {
 
     try {
       browser = await launch({
-        headless: 'new',
+        headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
       });
 
@@ -164,7 +164,7 @@ export class AccessibilityScanner {
       // Take screenshot if requested
       let screenshot: string | undefined;
       if (options.screenshot) {
-        const screenshotBuffer = await page.screenshot({ fullPage: true });
+        const screenshotBuffer = await page.screenshot({ fullPage: true }) as Buffer;
         screenshot = screenshotBuffer.toString('base64');
       }
 
@@ -255,7 +255,7 @@ export class AccessibilityScanner {
       // Take screenshot if requested
       let screenshot: string | undefined;
       if (options.screenshot) {
-        const screenshotBuffer = await page.screenshot({ fullPage: true });
+        const screenshotBuffer = await page.screenshot({ fullPage: true }) as Buffer;
         screenshot = screenshotBuffer.toString('base64');
       }
 

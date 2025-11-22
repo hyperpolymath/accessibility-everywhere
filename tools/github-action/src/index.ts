@@ -97,12 +97,13 @@ function generateSummary(result: any, url: string, wcagLevel: string): string {
   if (result.violations.length > 0) {
     markdown += `## Violations\n\n`;
     result.violations.slice(0, 10).forEach((v: any, i: number) => {
+      const impact = v.impact as 'critical' | 'serious' | 'moderate' | 'minor';
       const impactEmoji = {
         critical: '🔴',
         serious: '🟠',
         moderate: '🟡',
         minor: '🔵',
-      }[v.impact] || '⚪';
+      }[impact] || '⚪';
 
       markdown += `### ${i + 1}. ${impactEmoji} ${v.help}\n\n`;
       markdown += `**Impact:** ${v.impact}\n\n`;
