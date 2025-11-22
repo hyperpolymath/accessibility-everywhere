@@ -1,0 +1,45 @@
+name: 'Accessibility Everywhere Scan'
+description: 'Automated accessibility testing for your deployments'
+author: 'Accessibility Everywhere'
+branding:
+  icon: 'check-circle'
+  color: 'blue'
+
+inputs:
+  url:
+    description: 'URL to scan for accessibility issues'
+    required: true
+  wcag-level:
+    description: 'WCAG compliance level (A, AA, or AAA)'
+    required: false
+    default: 'AA'
+  fail-on-violations:
+    description: 'Fail the build if violations are found'
+    required: false
+    default: 'false'
+  min-score:
+    description: 'Minimum accessibility score required (0-100)'
+    required: false
+    default: '0'
+  comment-pr:
+    description: 'Post results as PR comment'
+    required: false
+    default: 'true'
+  github-token:
+    description: 'GitHub token for posting comments'
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  score:
+    description: 'Accessibility score (0-100)'
+  violations:
+    description: 'Number of violations found'
+  passes:
+    description: 'Number of passed checks'
+  report-url:
+    description: 'URL to full accessibility report'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

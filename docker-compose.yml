@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  arangodb:
+    image: arangodb:latest
+    container_name: accessibility-arangodb
+    environment:
+      ARANGO_ROOT_PASSWORD: ${ARANGO_ROOT_PASSWORD:-development}
+    ports:
+      - "8529:8529"
+    volumes:
+      - arangodb_data:/var/lib/arangodb3
+      - arangodb_apps:/var/lib/arangodb3-apps
+      - ./scripts/arangodb-init:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: tools/monitoring-api/Dockerfile
+    container_name: accessibility-api
+    environment:
+      NODE_ENV: production
+      ARANGO_URL: http://arangodb:8529
+      ARANGO_DATABASE: accessibility
+      ARANGO_USERNAME: root
+      ARANGO_PASSWORD: ${ARANGO_ROOT_PASSWORD:-development}
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - arangodb
+    restart: unless-stopped
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: tools/testing-dashboard/Dockerfile
+    container_name: accessibility-dashboard
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+  scanner:
+    build:
+      context: .
+      dockerfile: tools/adoption-tracker/Dockerfile
+    container_name: accessibility-scanner
+    environment:
+      ARANGO_URL: http://arangodb:8529
+      ARANGO_DATABASE: accessibility
+      ARANGO_USERNAME: root
+      ARANGO_PASSWORD: ${ARANGO_ROOT_PASSWORD:-development}
+    depends_on:
+      - arangodb
+    restart: unless-stopped
+
+volumes:
+  arangodb_data:
+  arangodb_apps:

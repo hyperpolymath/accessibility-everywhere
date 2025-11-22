@@ -1,0 +1,15 @@
+{
+  "name": "accessibility-everywhere-extension",
+  "version": "1.0.0",
+  "description": "Browser extension for real-time accessibility scanning",
+  "scripts": {
+    "build": "npm run copy-axe && npm run package",
+    "copy-axe": "cp ../../node_modules/axe-core/axe.min.js .",
+    "package": "node package-extension.js",
+    "package:chrome": "zip -r accessibility-everywhere-chrome.zip . -x '*.git*' 'node_modules/*' 'package*.json' '*.zip'",
+    "package:firefox": "zip -r accessibility-everywhere-firefox.zip . -x '*.git*' 'node_modules/*' 'package*.json' '*.zip'"
+  },
+  "devDependencies": {
+    "archiver": "^6.0.1"
+  }
+}

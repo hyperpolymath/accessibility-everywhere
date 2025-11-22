@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessibility Everywhere</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header role="banner">
+      <h1>Accessibility Everywhere</h1>
+      <p class="tagline">Making the web accessible to all</p>
+    </header>
+
+    <main role="main">
+      <div id="loading" class="loading" aria-live="polite" aria-busy="true">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Scanning page for accessibility issues...</p>
+      </div>
+
+      <div id="results" class="results" hidden aria-live="polite">
+        <div class="score-section">
+          <div class="score-circle" role="img" aria-labelledby="score-label">
+            <div class="score-value" id="score">--</div>
+          </div>
+          <p id="score-label" class="score-label">Accessibility Score</p>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-value violations" id="violations-count">0</span>
+            <span class="stat-label">Violations</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value passes" id="passes-count">0</span>
+            <span class="stat-label">Passes</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value incomplete" id="incomplete-count">0</span>
+            <span class="stat-label">Needs Review</span>
+          </div>
+        </div>
+
+        <div class="violations-list">
+          <h2>Issues Found</h2>
+          <div id="violations-details" role="list">
+            <!-- Violations will be inserted here -->
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="view-details" class="btn btn-primary">View Full Report</button>
+          <button id="export-report" class="btn btn-secondary">Export Report</button>
+          <button id="rescan" class="btn btn-secondary">Rescan</button>
+        </div>
+
+        <div class="wcag-level">
+          <label for="wcag-select">WCAG Level:</label>
+          <select id="wcag-select" name="wcag-level">
+            <option value="A">Level A</option>
+            <option value="AA" selected>Level AA</option>
+            <option value="AAA">Level AAA</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="error" class="error" hidden role="alert">
+        <p id="error-message"></p>
+        <button id="retry" class="btn btn-primary">Retry</button>
+      </div>
+    </main>
+
+    <footer role="contentinfo">
+      <p>
+        <a href="https://accessibility-everywhere.org" target="_blank" rel="noopener">Learn More</a> |
+        <a href="https://www.w3.org/WAI/WCAG21/quickref/" target="_blank" rel="noopener">WCAG Guidelines</a>
+      </p>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

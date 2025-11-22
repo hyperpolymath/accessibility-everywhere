@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Free accessibility testing tool. Scan any website for WCAG compliance instantly. Get detailed reports on accessibility violations and improvements.">
+  <title>Accessibility Scanner - Test Your Website for Free</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header role="banner" class="header">
+    <div class="container">
+      <nav role="navigation" aria-label="Main navigation">
+        <div class="logo">
+          <h1>Accessibility Everywhere</h1>
+          <p class="tagline">Making the web accessible to all</p>
+        </div>
+        <ul class="nav-links">
+          <li><a href="#scanner">Scanner</a></li>
+          <li><a href="#leaderboard">Leaderboard</a></li>
+          <li><a href="#api">API</a></li>
+          <li><a href="#about">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" role="main">
+    <!-- Hero Section -->
+    <section class="hero" id="scanner">
+      <div class="container">
+        <h2 class="hero-title">Test Your Website's Accessibility</h2>
+        <p class="hero-subtitle">Free WCAG compliance checker. Get instant results and detailed reports.</p>
+
+        <form id="scan-form" class="scan-form" role="search" aria-label="Website accessibility scanner">
+          <div class="input-group">
+            <label for="url-input" class="sr-only">Enter website URL</label>
+            <input
+              type="url"
+              id="url-input"
+              name="url"
+              placeholder="https://example.com"
+              required
+              aria-required="true"
+              aria-describedby="url-help"
+              autocomplete="url"
+            >
+            <span id="url-help" class="sr-only">Enter the full URL of the website you want to test</span>
+          </div>
+
+          <div class="wcag-selector">
+            <label for="wcag-level">WCAG Level:</label>
+            <select id="wcag-level" name="wcag-level">
+              <option value="A">Level A</option>
+              <option value="AA" selected>Level AA</option>
+              <option value="AAA">Level AAA</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-large">
+            <span>Scan Now</span>
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M8.5 5L13.5 10L8.5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </form>
+
+        <div class="stats">
+          <div class="stat-item">
+            <div class="stat-value">2.4M+</div>
+            <div class="stat-label">Sites Scanned</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">96%</div>
+            <div class="stat-label">Have Issues</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">Free</div>
+            <div class="stat-label">Forever</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Loading State -->
+    <section id="loading-section" class="loading-section" hidden aria-live="polite" aria-busy="false">
+      <div class="container">
+        <div class="loading-card">
+          <div class="spinner" aria-hidden="true"></div>
+          <h3>Scanning <span id="scanning-url"></span></h3>
+          <p>Analyzing accessibility compliance...</p>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results-section" class="results-section" hidden aria-live="polite">
+      <div class="container">
+        <div class="results-header">
+          <h2>Accessibility Report</h2>
+          <div class="report-meta">
+            <span id="report-url"></span>
+            <span id="report-date"></span>
+          </div>
+        </div>
+
+        <div class="score-card">
+          <div class="score-display">
+            <div class="score-circle" role="img" aria-labelledby="score-label">
+              <svg class="score-svg" viewBox="0 0 200 200">
+                <circle class="score-bg" cx="100" cy="100" r="90" />
+                <circle class="score-progress" id="score-progress" cx="100" cy="100" r="90" />
+              </svg>
+              <div class="score-content">
+                <div class="score-value" id="score-value">--</div>
+                <div class="score-grade" id="score-grade">--</div>
+              </div>
+            </div>
+            <p id="score-label" class="score-label">Accessibility Score</p>
+          </div>
+
+          <div class="score-summary">
+            <div class="summary-item violations">
+              <div class="summary-icon" aria-hidden="true">⚠️</div>
+              <div class="summary-content">
+                <div class="summary-value" id="violations-count">0</div>
+                <div class="summary-label">Violations</div>
+              </div>
+            </div>
+            <div class="summary-item passes">
+              <div class="summary-icon" aria-hidden="true">✓</div>
+              <div class="summary-content">
+                <div class="summary-value" id="passes-count">0</div>
+                <div class="summary-label">Passes</div>
+              </div>
+            </div>
+            <div class="summary-item incomplete">
+              <div class="summary-icon" aria-hidden="true">⚡</div>
+              <div class="summary-content">
+                <div class="summary-value" id="incomplete-count">0</div>
+                <div class="summary-label">Needs Review</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="violations-section">
+          <h3>Issues Found</h3>
+          <div class="violations-filter">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="critical">Critical</button>
+            <button class="filter-btn" data-filter="serious">Serious</button>
+            <button class="filter-btn" data-filter="moderate">Moderate</button>
+            <button class="filter-btn" data-filter="minor">Minor</button>
+          </div>
+          <div id="violations-list" class="violations-list" role="list">
+            <!-- Violations will be inserted here -->
+          </div>
+        </div>
+
+        <div class="actions-section">
+          <button id="download-report" class="btn btn-primary">
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M10 2V14M10 14L6 10M10 14L14 10M3 18H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Download Report
+          </button>
+          <button id="share-report" class="btn btn-secondary">
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M13 8L17 4M17 4H13M17 4V8M8 4H6C4.89543 4 4 4.89543 4 6V14C4 15.1046 4.89543 16 6 16H14C15.1046 16 16 15.1046 16 14V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Share Report
+          </button>
+          <button id="new-scan" class="btn btn-secondary">New Scan</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Leaderboard Section -->
+    <section id="leaderboard" class="leaderboard-section">
+      <div class="container">
+        <h2>Public Accessibility Leaderboard</h2>
+        <p class="section-subtitle">Top 100 websites ranked by accessibility score</p>
+
+        <div class="leaderboard-filters">
+          <button class="filter-btn active" data-category="all">All Sites</button>
+          <button class="filter-btn" data-category="ecommerce">E-commerce</button>
+          <button class="filter-btn" data-category="news">News</button>
+          <button class="filter-btn" data-category="government">Government</button>
+          <button class="filter-btn" data-category="education">Education</button>
+        </div>
+
+        <div class="leaderboard-table-container">
+          <table class="leaderboard-table" role="table">
+            <thead>
+              <tr>
+                <th scope="col">Rank</th>
+                <th scope="col">Website</th>
+                <th scope="col">Score</th>
+                <th scope="col">Grade</th>
+                <th scope="col">Violations</th>
+                <th scope="col">Last Scanned</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+              <!-- Leaderboard rows will be inserted here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- API Section -->
+    <section id="api" class="api-section">
+      <div class="container">
+        <h2>API Access</h2>
+        <p class="section-subtitle">Integrate accessibility scanning into your workflow</p>
+
+        <div class="api-grid">
+          <div class="api-card">
+            <h3>REST API</h3>
+            <p>Simple REST API for on-demand scanning</p>
+            <pre><code>curl -X POST https://api.accessibility-everywhere.org/v1/scan \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com"}'</code></pre>
+            <a href="/docs/api" class="btn btn-secondary">View Documentation</a>
+          </div>
+
+          <div class="api-card">
+            <h3>GitHub Action</h3>
+            <p>Automated accessibility testing in your CI/CD pipeline</p>
+            <pre><code>- uses: accessibility-everywhere/scan-action@v1
+  with:
+    url: ${{ env.DEPLOY_URL }}
+    wcag-level: AA</code></pre>
+            <a href="/docs/github-action" class="btn btn-secondary">Get Started</a>
+          </div>
+
+          <div class="api-card">
+            <h3>npm Package</h3>
+            <p>Integrate scanning into your Node.js applications</p>
+            <pre><code>npm install @accessibility-everywhere/scanner
+
+const scanner = require('@accessibility-everywhere/scanner');
+const results = await scanner.scan('https://example.com');</code></pre>
+            <a href="/docs/npm" class="btn btn-secondary">Install Package</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+      <div class="container">
+        <h2>About This Project</h2>
+        <div class="about-content">
+          <div class="about-text">
+            <p>Accessibility Everywhere is a comprehensive platform designed to make web accessibility a search engine ranking factor. We're following the proven HTTPS adoption playbook:</p>
+            <ul>
+              <li><strong>User-facing tools</strong> drive demand for accessible websites</li>
+              <li><strong>Free infrastructure</strong> removes barriers for developers</li>
+              <li><strong>Public accountability</strong> creates pressure for improvement</li>
+              <li><strong>Search engines</strong> ultimately integrate accessibility into rankings</li>
+            </ul>
+            <p>Currently, 96% of top websites have accessibility problems (WebAIM 2024). We're working to change that.</p>
+          </div>
+          <div class="about-stats">
+            <div class="about-stat">
+              <div class="about-stat-value">1 billion+</div>
+              <div class="about-stat-label">People with disabilities worldwide</div>
+            </div>
+            <div class="about-stat">
+              <div class="about-stat-value">96%</div>
+              <div class="about-stat-label">Top websites with accessibility errors</div>
+            </div>
+            <div class="about-stat">
+              <div class="about-stat-value">WCAG 2.1</div>
+              <div class="about-stat-label">International accessibility standard</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer role="contentinfo" class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h3>Resources</h3>
+          <ul>
+            <li><a href="https://www.w3.org/WAI/WCAG21/quickref/">WCAG Guidelines</a></li>
+            <li><a href="https://www.w3.org/WAI/ARIA/apg/">ARIA Practices</a></li>
+            <li><a href="https://webaim.org/">WebAIM</a></li>
+            <li><a href="/docs">Documentation</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3>Tools</h3>
+          <ul>
+            <li><a href="/extension">Browser Extension</a></li>
+            <li><a href="/api">API</a></li>
+            <li><a href="/github-action">GitHub Action</a></li>
+            <li><a href="/cli">CLI Tool</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3>Community</h3>
+          <ul>
+            <li><a href="https://github.com/accessibility-everywhere">GitHub</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/contribute">Contribute</a></li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3>Legal</h3>
+          <ul>
+            <li><a href="/privacy">Privacy Policy</a></li>
+            <li><a href="/terms">Terms of Service</a></li>
+            <li><a href="/license">License (MIT)</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 Accessibility Everywhere. Making the web accessible to all.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
