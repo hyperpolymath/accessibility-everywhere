@@ -1,4 +1,4 @@
-# Accessibility Everywhere 🌐
+= Accessibility Everywhere 🌐
 
 > Making web accessibility a search engine ranking factor
 
@@ -7,18 +7,18 @@
 
 ---
 
-## 🎯 Mission
+== 🎯 Mission
 
-Make the web accessible to the **1+ billion people** worldwide with disabilities by following the proven HTTPS playbook: combine free tools, public accountability, and economic incentives to drive universal adoption.
+Make the web accessible to the *1+ billion people* worldwide with disabilities by following the proven HTTPS playbook: combine free tools, public accountability, and economic incentives to drive universal adoption.
 
-### The Problem
+=== The Problem
 
-- **96% of top websites** have accessibility errors (WebAIM 2024)
+- *96% of top websites* have accessibility errors (WebAIM 2024)
 - Legal mandates (ADA, WCAG) exist but adoption remains low
 - No economic incentive for accessibility improvements
 - Developers lack easy-to-use, free tools
 
-### Our Solution
+=== Our Solution
 
 Follow the HTTPS success model:
 
@@ -27,17 +27,17 @@ Follow the HTTPS success model:
 | Browser warnings | Browser extension showing scores |
 | Let's Encrypt (free certs) | Free API + tools + infrastructure |
 | Public pressure | Accessibility leaderboard |
-| Google ranking boost | **Goal: Search ranking factor** |
+| Google ranking boost | *Goal: Search ranking factor* |
 
-**Result for HTTPS**: 45% → 95% adoption in 5 years
+*Result for HTTPS*: 45% → 95% adoption in 5 years
 
-**Goal for Accessibility**: Same transformative impact
+*Goal for Accessibility*: Same transformative impact
 
 ---
 
-## 🚀 What We Built
+== 🚀 What We Built
 
-### 1. Browser Extension
+=== 1. Browser Extension
 Real-time accessibility scanning for any website
 
 - ✅ Chrome & Firefox support
@@ -48,7 +48,7 @@ Real-time accessibility scanning for any website
 
 [Get Extension](tools/browser-extension/) | [Documentation](tools/browser-extension/README.md)
 
-### 2. Testing Dashboard
+=== 2. Testing Dashboard
 Free public accessibility scanner (like securityheaders.com)
 
 - ✅ Instant URL scanning
@@ -59,7 +59,7 @@ Free public accessibility scanner (like securityheaders.com)
 
 [Try Dashboard](https://accessibility-everywhere.org) | [Documentation](tools/testing-dashboard/)
 
-### 3. Monitoring API
+=== 3. Monitoring API
 Violation reporting and analytics (like report-uri.com)
 
 - ✅ REST API for scanning
@@ -71,7 +71,7 @@ Violation reporting and analytics (like report-uri.com)
 
 [API Docs](tools/monitoring-api/) | [Get API Key](https://accessibility-everywhere.org/api)
 
-### 4. GitHub Action
+=== 4. GitHub Action
 Automated accessibility testing in CI/CD
 
 ```yaml
@@ -84,7 +84,7 @@ Automated accessibility testing in CI/CD
 
 [Get Started](tools/github-action/) | [Marketplace](https://github.com/marketplace/actions/accessibility-scan)
 
-### 5. CLI Tool
+=== 5. CLI Tool
 Command-line accessibility scanning
 
 ```bash
@@ -97,7 +97,7 @@ a11y-scan ci https://staging.example.com --min-score 80
 
 [Install](tools/cli/) | [Documentation](tools/cli/README.md)
 
-### 6. npm Package
+=== 6. npm Package
 Programmatic accessibility scanning for developers
 
 ```javascript
@@ -116,14 +116,14 @@ console.log(`Score: ${result.score}/100`);
 
 ---
 
-## 📊 Proposed Web Standards
+== 📊 Proposed Web Standards
 
-### Accessibility-Policy Header
+=== Accessibility-Policy Header
 ```http
 Accessibility-Policy: wcag-level=AA; public-score=true; report-uri=/api/a11y
 ```
 
-### /.well-known/accessibility Endpoint
+=== /.well-known/accessibility Endpoint
 ```json
 {
   "version": "1.0",
@@ -133,7 +133,7 @@ Accessibility-Policy: wcag-level=AA; public-score=true; report-uri=/api/a11y
 }
 ```
 
-### DNS TXT Record
+=== DNS TXT Record
 ```
 _accessibility.example.com TXT "v=ACCESSIBILITY1; wcag=AA; score=94"
 ```
@@ -142,7 +142,7 @@ _accessibility.example.com TXT "v=ACCESSIBILITY1; wcag=AA; score=94"
 
 ---
 
-## 🏗 Architecture
+== 🏗 Architecture
 
 ```
 ┌─────────────────────────────────────────┐
@@ -168,18 +168,18 @@ _accessibility.example.com TXT "v=ACCESSIBILITY1; wcag=AA; score=94"
       └───────────────────────┘
 ```
 
-**Technology Stack:**
-- **Frontend**: Vanilla JS, React
-- **Backend**: Node.js + Express
-- **Database**: ArangoDB (graph + document)
-- **Scanner**: Puppeteer/Playwright + axe-core
-- **Infrastructure**: Docker, CloudFlare Pages/Workers
+*Technology Stack:*
+- *Frontend*: Vanilla JS, React
+- *Backend*: Node.js + Express
+- *Database*: ArangoDB (graph + document)
+- *Scanner*: Puppeteer/Playwright + axe-core
+- *Infrastructure*: Docker, CloudFlare Pages/Workers
 
 [Technical Documentation](docs/ACCESSIBILITY_INITIATIVE.md#5-technical-architecture)
 
 ---
 
-## 📖 Project Structure
+== 📖 Project Structure
 
 ```
 accessibility-everywhere/
@@ -211,41 +211,41 @@ accessibility-everywhere/
 
 ---
 
-## 🚦 Quick Start & Usage
+== 🚦 Quick Start & Usage
 
-### Run Full Stack Locally
+=== Run Full Stack Locally
 
 ```bash
-# Clone repository
+= Clone repository
 git clone https://github.com/accessibility-everywhere/accessibility-everywhere
 cd accessibility-everywhere
 
-# Start all services with Docker
+= Start all services with Docker
 docker-compose up
 
-# Services available at:
-# - Dashboard: http://localhost:8080
-# - API: http://localhost:3000
-# - ArangoDB: http://localhost:8529
+= Services available at:
+= - Dashboard: http://localhost:8080
+= - API: http://localhost:3000
+= - ArangoDB: http://localhost:8529
 ```
 
-### Use Individual Tools
+=== Use Individual Tools
 
-**Browser Extension:**
+*Browser Extension:*
 ```bash
 cd tools/browser-extension
-# Load unpacked extension in Chrome/Firefox
+= Load unpacked extension in Chrome/Firefox
 ```
 
-**CLI:**
+*CLI:*
 ```bash
 npm install -g @accessibility-everywhere/cli
 a11y-scan https://example.com
 ```
 
-**GitHub Action:**
+*GitHub Action:*
 ```yaml
-# .github/workflows/accessibility.yml
+= .github/workflows/accessibility.yml
 name: Accessibility Check
 on: [pull_request]
 jobs:
@@ -257,7 +257,7 @@ jobs:
           url: https://staging.example.com
 ```
 
-**npm Package:**
+*npm Package:*
 ```bash
 npm install @accessibility-everywhere/scanner
 ```
@@ -266,57 +266,57 @@ npm install @accessibility-everywhere/scanner
 
 ---
 
-## 🎯 The Strategy
+== 🎯 The Strategy
 
-### Phase 1: Foundation (Months 1-3) ✅
+=== Phase 1: Foundation (Months 1-3) ✅
 - [x] Build core tools
 - [x] Create comprehensive documentation
 - [ ] Public launch
 - [ ] Initial user base (10K+)
 
-### Phase 2: Adoption (Months 4-9)
+=== Phase 2: Adoption (Months 4-9)
 - [ ] W3C/ISOC partnerships
 - [ ] Conference presentations
 - [ ] Framework integrations
 - [ ] User base: 50K+
 
-### Phase 3: Public Pressure (Months 10-18)
+=== Phase 3: Public Pressure (Months 10-18)
 - [ ] Public leaderboard (top 10K sites)
 - [ ] Media campaign
 - [ ] "Name and shame" high-profile failures
 - [ ] 1000+ badges displayed
 
-### Phase 4: Search Engine Integration (Months 18-36)
+=== Phase 4: Search Engine Integration (Months 18-36)
 - [ ] Formal proposals to Google/Bing/DuckDuckGo
 - [ ] Technical collaboration
 - [ ] Pilot programs
-- [ ] **🎯 PUBLIC COMMITMENT TO RANKING FACTOR**
+- [ ] *🎯 PUBLIC COMMITMENT TO RANKING FACTOR*
 
 [Full Strategy Document](docs/ACCESSIBILITY_INITIATIVE.md)
 
 ---
 
-## 🤝 Get Involved
+== 🤝 Get Involved
 
-### For Users
+=== For Users
 - Install the [browser extension](tools/browser-extension/)
 - Test your site on the [dashboard](https://accessibility-everywhere.org)
 - Share accessibility scores
 - Report issues
 
-### For Developers
+=== For Developers
 - Use the [GitHub Action](tools/github-action/) in your CI/CD
 - Install the [CLI tool](tools/cli/)
 - Integrate the [npm package](packages/scanner/)
 - Contribute code (see [CONTRIBUTING.md](CONTRIBUTING.md))
 
-### For Organizations
+=== For Organizations
 - Display accessibility badge on your site
 - Partner with us ([partnerships@accessibility-everywhere.org](mailto:partnerships@accessibility-everywhere.org))
 - Sponsor development
 - Provide feedback
 
-### For Advocates
+=== For Advocates
 - Spread awareness on social media
 - Write about the initiative
 - Speak at conferences
@@ -324,7 +324,7 @@ npm install @accessibility-everywhere/scanner
 
 ---
 
-## 📚 Documentation
+== 📚 Documentation
 
 | Document | Description |
 |----------|-------------|
@@ -338,9 +338,9 @@ npm install @accessibility-everywhere/scanner
 
 ---
 
-## 💰 Pricing
+== 💰 Pricing
 
-### Free Tier (Forever)
+=== Free Tier (Forever)
 - ✅ Browser extension
 - ✅ Public dashboard scans
 - ✅ CLI tool (basic)
@@ -348,7 +348,7 @@ npm install @accessibility-everywhere/scanner
 - ✅ 1,000 API requests/month
 - ✅ Public badge
 
-### Pro Tier ($49/month)
+=== Pro Tier ($49/month)
 - Everything in Free, plus:
 - 10,000 API requests/month
 - Private scans
@@ -356,7 +356,7 @@ npm install @accessibility-everywhere/scanner
 - Priority support
 - Custom branding
 
-### Enterprise ($499/month)
+=== Enterprise ($499/month)
 - Everything in Pro, plus:
 - Unlimited scans
 - Multi-site dashboards
@@ -369,15 +369,15 @@ npm install @accessibility-everywhere/scanner
 
 ---
 
-## 📈 Impact
+== 📈 Impact
 
-### Current Web Accessibility
+=== Current Web Accessibility
 - 96% of top sites have errors (WebAIM 2024)
 - 1+ billion people affected globally
 - $13 trillion in disability community spending
 - Growing legal liability (ADA lawsuits)
 
-### Our Goal
+=== Our Goal
 - 50% reduction in errors (top 1M sites) by Year 3
 - 100,000+ developers using tools daily
 - Major search engines commit to ranking factor
@@ -385,9 +385,9 @@ npm install @accessibility-everywhere/scanner
 
 ---
 
-## 🌟 Why This Will Work
+== 🌟 Why This Will Work
 
-### Proven Model
+=== Proven Model
 HTTPS adoption (2014-2019):
 - Started: 45% adoption
 - Google ranking factor announced
@@ -395,17 +395,17 @@ HTTPS adoption (2014-2019):
 - Public pressure (browser warnings)
 - Result: 95% adoption in 5 years
 
-### Our Advantages
-1. **Legal mandate**: ADA, WCAG already legally required
-2. **Moral imperative**: Stronger ethical case than HTTPS
-3. **Market size**: 1+ billion disabled users
-4. **Existing standards**: WCAG 2.1/2.2 well-defined
-5. **Free tools**: Remove all cost barriers
-6. **Community**: Strong accessibility advocacy
+=== Our Advantages
+1. *Legal mandate*: ADA, WCAG already legally required
+2. *Moral imperative*: Stronger ethical case than HTTPS
+3. *Market size*: 1+ billion disabled users
+4. *Existing standards*: WCAG 2.1/2.2 well-defined
+5. *Free tools*: Remove all cost barriers
+6. *Community*: Strong accessibility advocacy
 
 ---
 
-## 🙏 Acknowledgments
+== 🙏 Acknowledgments
 
 This initiative builds on decades of work by:
 - W3C Web Accessibility Initiative
@@ -418,7 +418,7 @@ We stand on the shoulders of giants.
 
 ---
 
-## 📄 License
+== 📄 License
 
 MIT License - see [LICENSE](LICENSE) for details.
 
@@ -426,16 +426,16 @@ All tools are free and open source. Forever.
 
 ---
 
-## 📞 Contact
+== 📞 Contact
 
-- **Website**: [accessibility-everywhere.org](https://accessibility-everywhere.org)
-- **Email**: [hello@accessibility-everywhere.org](mailto:hello@accessibility-everywhere.org)
-- **Twitter**: [@a11y_everywhere](https://twitter.com/a11y_everywhere)
-- **GitHub**: [github.com/accessibility-everywhere](https://github.com/accessibility-everywhere)
+- *Website*: [accessibility-everywhere.org](https://accessibility-everywhere.org)
+- *Email*: [hello@accessibility-everywhere.org](mailto:hello@accessibility-everywhere.org)
+- *Twitter*: [@a11y_everywhere](https://twitter.com/a11y_everywhere)
+- *GitHub*: [github.com/accessibility-everywhere](https://github.com/accessibility-everywhere)
 
 ---
 
-## ⭐ Star Us!
+== ⭐ Star Us!
 
 If you believe in making the web accessible to all, star this repository and help spread the word!
 
@@ -443,7 +443,7 @@ If you believe in making the web accessible to all, star this repository and hel
 
 ---
 
-**Together, we can make the web accessible to everyone.** 🌐♿️
+*Together, we can make the web accessible to everyone.* 🌐♿️
 
 ---
 

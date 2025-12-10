@@ -1,0 +1,36 @@
+= accessibility-everywhere - Citation Guide
+:toc:
+
+== BibTeX
+
+[source,bibtex]
+----
+@software{accessibility-everywhere_2025,
+  author = {Polymath, Hyper},
+  title = {accessibility-everywhere},
+  year = {2025},
+  url = {https://github.com/hyperpolymath/accessibility-everywhere},
+  license = {AGPL-3.0-or-later}
+}
+----
+
+== Harvard Style
+
+Polymath, H. (2025) _accessibility-everywhere_ [Computer software]. Available at: https://github.com/hyperpolymath/accessibility-everywhere
+
+== OSCOLA
+
+Hyper Polymath, 'accessibility-everywhere' (2025) <https://github.com/hyperpolymath/accessibility-everywhere>
+
+== MLA
+
+Polymath, Hyper. "accessibility-everywhere." 2025, github.com/hyperpolymath/accessibility-everywhere.
+
+== APA 7
+
+Polymath, H. (2025). _accessibility-everywhere_ [Computer software]. GitHub. https://github.com/hyperpolymath/accessibility-everywhere
+
+== See Also
+
+* link:../CITATION.cff[CITATION.cff]
+* link:../codemeta.json[codemeta.json]
