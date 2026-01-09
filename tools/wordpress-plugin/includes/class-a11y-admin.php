@@ -247,10 +247,113 @@ class A11Y_Admin {
     }
 
     /**
-     * Render common violations
+     * Render common violations aggregated from all scanned posts.
+     *
+     * Displays a summary of the most frequent accessibility violations
+     * found across the site's content.
      */
     private function render_common_violations() {
-        // This would aggregate violation data
-        echo '<p>' . __('Configure API key to track violations', 'accessibility-everywhere') . '</p>';
+        global $wpdb;
+
+        // Get all violation data from post meta
+        $violations_data = $wpdb->get_col(
+            "SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = '_a11y_violations' AND meta_value != ''"
+        );
+
+        if (empty($violations_data)) {
+            echo '<p>' . __('No violation data available yet. Scan some pages to see common issues.', 'accessibility-everywhere') . '</p>';
+            echo '<p class="description">' . __('Tip: Enable auto-scan in settings or use the Quick Scan feature.', 'accessibility-everywhere') . '</p>';
+            return;
+        }
+
+        // Aggregate violations by type
+        $violation_counts = [];
+        $violation_details = [];
+
+        foreach ($violations_data as $json_data) {
+            $violations = json_decode($json_data, true);
+            if (!is_array($violations)) {
+                continue;
+            }
+
+            foreach ($violations as $violation) {
+                $id = $violation['id'] ?? 'unknown';
+
+                if (!isset($violation_counts[$id])) {
+                    $violation_counts[$id] = 0;
+                    $violation_details[$id] = [
+                        'description' => $violation['description'] ?? $id,
+                        'impact' => $violation['impact'] ?? 'unknown',
+                        'help' => $violation['help'] ?? '',
+                        'helpUrl' => $violation['helpUrl'] ?? '',
+                    ];
+                }
+
+                // Count nodes/instances
+                $node_count = isset($violation['nodes']) ? count($violation['nodes']) : 1;
+                $violation_counts[$id] += $node_count;
+            }
+        }
+
+        if (empty($violation_counts)) {
+            echo '<p class="a11y-success">' . __('No violations found across scanned pages.', 'accessibility-everywhere') . '</p>';
+            return;
+        }
+
+        // Sort by count descending
+        arsort($violation_counts);
+
+        // Display top 10 violations
+        $top_violations = array_slice($violation_counts, 0, 10, true);
+
+        echo '<table class="widefat striped">';
+        echo '<thead><tr>';
+        echo '<th>' . esc_html__('Issue', 'accessibility-everywhere') . '</th>';
+        echo '<th>' . esc_html__('Impact', 'accessibility-everywhere') . '</th>';
+        echo '<th>' . esc_html__('Count', 'accessibility-everywhere') . '</th>';
+        echo '</tr></thead>';
+        echo '<tbody>';
+
+        foreach ($top_violations as $violation_id => $count) {
+            $details = $violation_details[$violation_id];
+            $impact_class = 'a11y-impact-' . sanitize_html_class($details['impact']);
+
+            echo '<tr>';
+            echo '<td>';
+
+            if (!empty($details['helpUrl'])) {
+                echo '<a href="' . esc_url($details['helpUrl']) . '" target="_blank" rel="noopener noreferrer">';
+                echo esc_html($details['description']);
+                echo ' <span class="dashicons dashicons-external" aria-hidden="true"></span>';
+                echo '<span class="screen-reader-text">' . esc_html__('(opens in new tab)', 'accessibility-everywhere') . '</span>';
+                echo '</a>';
+            } else {
+                echo esc_html($details['description']);
+            }
+
+            if (!empty($details['help'])) {
+                echo '<p class="description">' . esc_html($details['help']) . '</p>';
+            }
+
+            echo '</td>';
+            echo '<td><span class="a11y-impact-badge ' . esc_attr($impact_class) . '">' . esc_html(ucfirst($details['impact'])) . '</span></td>';
+            echo '<td><strong>' . esc_html(number_format_i18n($count)) . '</strong></td>';
+            echo '</tr>';
+        }
+
+        echo '</tbody></table>';
+
+        // Show total counts summary
+        $total_violations = array_sum($violation_counts);
+        $unique_issues = count($violation_counts);
+
+        echo '<p class="a11y-summary">';
+        printf(
+            /* translators: 1: total violation count, 2: unique issue count */
+            esc_html__('Total: %1$s violations across %2$s unique issue types.', 'accessibility-everywhere'),
+            '<strong>' . esc_html(number_format_i18n($total_violations)) . '</strong>',
+            '<strong>' . esc_html(number_format_i18n($unique_issues)) . '</strong>'
+        );
+        echo '</p>';
     }
 }

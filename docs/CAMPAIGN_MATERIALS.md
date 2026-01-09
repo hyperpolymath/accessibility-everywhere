@@ -246,9 +246,9 @@ THE CASE:
    - Machine-readable headers (proposed)
 
 4. Proven Demand:
-   - [XXX,XXX] users of our tools (6 months)
-   - [XXX] companies actively monitoring
-   - [XXX] GitHub Action installs
+   - [INSERT_USER_COUNT] users of our tools (6 months)
+   - [INSERT_COMPANY_COUNT] companies actively monitoring
+   - [INSERT_INSTALL_COUNT] GitHub Action installs
    - Growing developer awareness
 
 PROPOSED IMPLEMENTATION:
@@ -301,10 +301,10 @@ WHAT WE OFFER:
 
 DATA AVAILABLE:
 After [6/12/18] months of operation:
-- [XXX,XXX] sites scanned
-- [XXX] paying API customers
-- [XXX] developers using tools
-- [XX]% average score improvement
+- [INSERT_SCAN_COUNT] sites scanned
+- [INSERT_CUSTOMER_COUNT] paying API customers
+- [INSERT_DEVELOPER_COUNT] developers using tools
+- [INSERT_IMPROVEMENT_PERCENT]% average score improvement
 
 This demonstrates real demand for accessibility as a ranking factor.
 

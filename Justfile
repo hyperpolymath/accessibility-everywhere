@@ -172,12 +172,35 @@ docs-api:
 # Build documentation site
 docs-build:
     @echo "Building documentation..."
-    @echo "TODO: Implement docs site build"
+    @mkdir -p docs/_site
+    @# Convert AsciiDoc files to HTML
+    @for file in *.adoc docs/*.adoc; do \
+        if [ -f "$$file" ]; then \
+            echo "Converting $$file..."; \
+            asciidoctor -D docs/_site "$$file" 2>/dev/null || echo "  (skipped - asciidoctor not installed)"; \
+        fi; \
+    done
+    @# Copy markdown files
+    @for file in docs/*.md; do \
+        if [ -f "$$file" ]; then \
+            cp "$$file" docs/_site/ 2>/dev/null || true; \
+        fi; \
+    done
+    @# Copy static assets
+    @cp -r docs/*.md docs/_site/ 2>/dev/null || true
+    @cp README.adoc docs/_site/index.adoc 2>/dev/null || true
+    @echo "✓ Documentation built in docs/_site/"
 
 # Serve documentation locally
 docs-serve:
     @echo "Serving documentation..."
-    @echo "TODO: Implement docs site serve"
+    @just docs-build
+    @echo "Starting server at http://localhost:8000"
+    @echo "Press Ctrl+C to stop"
+    @cd docs/_site && python3 -m http.server 8000 2>/dev/null || \
+        (cd docs/_site && python -m SimpleHTTPServer 8000 2>/dev/null) || \
+        (cd docs/_site && deno run --allow-net --allow-read https://deno.land/std/http/file_server.ts) || \
+        echo "Error: No suitable HTTP server found (python3, python, or deno required)"
 
 # === Cleanup ===
 
@@ -236,8 +259,37 @@ check-build-system:
 # Check tests exist
 check-tests:
     @echo "Checking test infrastructure..."
-    @echo "⚠️  Tests need to be implemented"
-    @echo "TODO: Add comprehensive test suite"
+    @# Check for test directories
+    @test_dirs=0; \
+    for dir in tests test __tests__ spec; do \
+        if [ -d "$$dir" ] || [ -d "packages/*/$$dir" ] || [ -d "components/*/$$dir" ]; then \
+            test_dirs=$$((test_dirs + 1)); \
+        fi; \
+    done; \
+    if [ $$test_dirs -eq 0 ]; then \
+        echo "⚠️  No test directories found (tests/, test/, __tests__, spec/)"; \
+    else \
+        echo "✅ Found $$test_dirs test directories"; \
+    fi
+    @# Check for test files
+    @test_files=$$(find . -name "*.test.*" -o -name "*.spec.*" -o -name "test_*.py" -o -name "*_test.go" 2>/dev/null | grep -v node_modules | wc -l); \
+    if [ "$$test_files" -eq 0 ]; then \
+        echo "⚠️  No test files found"; \
+    else \
+        echo "✅ Found $$test_files test files"; \
+    fi
+    @# Check for test configuration
+    @if [ -f "jest.config.js" ] || [ -f "jest.config.ts" ] || [ -f "vitest.config.ts" ] || [ -f "pytest.ini" ] || [ -f "phpunit.xml" ]; then \
+        echo "✅ Test configuration found"; \
+    else \
+        echo "⚠️  No test configuration found"; \
+    fi
+    @# Check for test scripts in package.json
+    @if grep -q '"test"' package.json 2>/dev/null; then \
+        echo "✅ Test script configured in package.json"; \
+    else \
+        echo "⚠️  No test script in package.json"; \
+    fi
 
 # === Utility ===
 
