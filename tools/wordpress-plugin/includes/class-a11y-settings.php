@@ -1,6 +1,15 @@
 <?php
 /**
- * Settings class (placeholder for additional settings functionality)
+ * Settings class for managing Accessibility Everywhere plugin configuration.
+ *
+ * Provides methods to get, set, and manage plugin settings including:
+ * - Auto-scan on publish
+ * - WCAG compliance level
+ * - Minimum score thresholds
+ * - API key management
+ * - Badge display preferences
+ *
+ * @since 1.0.0
  */
 class A11Y_Settings {
     public static function get_defaults() {
