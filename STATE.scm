@@ -1,34 +1,71 @@
 ;; SPDX-License-Identifier: PMPL-1.0
-;; STATE.scm - Current project state
+;; STATE.scm - Project state for accessibility-everywhere
 
-(define project-state
-  `((metadata
-      ((version . "1.0.0")
-       (schema-version . "1")
-       (created . "2026-01-10T13:47:42+00:00")
-       (updated . "2026-01-10T13:47:42+00:00")
-       (project . "accessibility-everywhere")
-       (repo . "accessibility-everywhere")))
+(state
+  (metadata
+    (version "0.2.0")
+    (schema-version "1.0")
+    (created "2024-06-01")
+    (updated "2025-01-16")
+    (project "accessibility-everywhere")
+    (repo "hyperpolymath/accessibility-everywhere"))
 
-    (current-position
-      ((phase . "Active Development")
-       (overall-completion . 50)
-       (working-features . ())))
+  (project-context
+    (name "Accessibility Everywhere")
+    (tagline "Making web accessibility a search engine ranking factor")
+    (tech-stack ("javascript" "react" "node" "express" "arangodb" "puppeteer")))
 
-    (route-to-mvp
-      ((milestones
-        ((v1.0 . ((items . ("Initial setup" "Core functionality"))
-                  (status . "in-progress")))))))
+  (current-position
+    (phase "foundation")
+    (overall-completion 20)
+    (components
+      ((browser-extension . 30)
+       (testing-dashboard . 20)
+       (monitoring-api . 15)
+       (github-action . 25)
+       (cli-tool . 20)
+       (npm-scanner . 15)
+       (web-standards . 10)))
+    (working-features
+      ("Chrome/Firefox extension framework"
+       "WCAG Level A/AA/AAA testing via axe-core"
+       "Public testing dashboard concept"
+       "REST API design"
+       "Proposed web standards (Accessibility-Policy header)")))
 
-    (blockers-and-issues
-      ((critical . ())
-       (high . ())
-       (medium . ())
-       (low . ())))
+  (route-to-mvp
+    (milestones
+      ((name "Phase 1: Foundation")
+       (status "in-progress")
+       (items
+         ("Core tools built"
+          "Documentation"
+          "Public launch"
+          "Initial user base")))
+      ((name "Phase 2: Integration")
+       (status "pending")
+       (items
+         ("GitHub Action"
+          "npm package"
+          "CI/CD integration")))
+      ((name "Phase 3: Standards")
+       (status "pending")
+       (items
+         ("W3C proposal"
+          "Search engine partnerships"
+          "Industry adoption")))))
 
-    (critical-next-actions
-      ((immediate . ())
-       (this-week . ())
-       (this-month . ())))
+  (blockers-and-issues
+    (critical ())
+    (high ())
+    (medium
+      (("Implementation" . "Mostly documentation, minimal implementation")))
+    (low ()))
 
-    (session-history . ())))
+  (critical-next-actions
+    (immediate
+      ("Implement browser extension core"))
+    (this-week
+      ("Build axe-core integration"))
+    (this-month
+      ("Launch public testing dashboard"))))
