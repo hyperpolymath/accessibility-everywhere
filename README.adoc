@@ -472,3 +472,8 @@ If you believe in making the web accessible to all, star this repository and hel
 ---
 
 *Built with ❤️ by the Accessibility Everywhere community*
+
+
+== Architecture
+
+See link:TOPOLOGY.md[TOPOLOGY.md] for a visual architecture map and completion dashboard.
