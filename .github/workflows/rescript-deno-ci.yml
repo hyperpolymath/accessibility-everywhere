@@ -2,14 +2,19 @@
 name: ReScript/Deno CI
 on: [push, pull_request]
 
+permissions: read-all
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: denoland/setup-deno@v1
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.1
+      - uses: denoland/setup-deno@9db7efd2d8d10d73081f64624f472263a3d12f20 # v1.1.4
         with:
           deno-version: v1.x
+
       
       - name: Deno lint
         run: deno lint
@@ -32,9 +37,12 @@ jobs:
 
   security:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: denoland/setup-deno@v1
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.1
+      - uses: denoland/setup-deno@9db7efd2d8d10d73081f64624f472263a3d12f20 # v1.1.4
+
       - name: Check permissions
         run: |
           # Audit for dangerous permissions

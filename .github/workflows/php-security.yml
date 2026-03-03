@@ -1,11 +1,17 @@
 # SPDX-License-Identifier: MPL-2.0-or-later
 name: PHP Security Check
 on: [push, pull_request]
+
+permissions: read-all
+
 jobs:
   security:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.1
+
       - name: PHP Security Scan
         run: |
           # Check for dangerous functions
