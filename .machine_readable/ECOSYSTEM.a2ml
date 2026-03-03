@@ -1,0 +1,14 @@
+# Accessibility Everywhere Ecosystem Manifest (A2ML)
+@ecosystem { version: "0.1.0", last-updated: "2026-03-03" }
+
+@project:
+name: "accessibility-everywhere"
+purpose: "Standardize and rank web accessibility"
+role: "standards-platform"
+@end
+
+@attestation:
+originalBytes: [Attested by Gemini CLI]
+signature: PLACEHOLDER-ED25519-SIGNATURE
+timestamp: 2026-03-03T12:00:00Z
+@end
