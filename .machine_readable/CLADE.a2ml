@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Clade declaration — part of the gv-clade-index registry
+# See: https://github.com/hyperpolymath/gv-clade-index
+
+[identity]
+uuid = "97e58fb2-9134-5a48-ac0a-96c8cfc42d5e"
+primary-forge = "github"
+primary-owner = "hyperpolymath"
+canonical-name = "accessibility-everywhere"
+prefixed-name = "gv-accessibility-everywhere"
+
+[clade]
+primary = "gv"
+secondary = ["ap"]
+assigned = "2026-03-16"
+rationale = ""
+
+[forges]
+github = "hyperpolymath/accessibility-everywhere"
+gitlab = "hyperpolymath/accessibility-everywhere"
+bitbucket = "hyperpolymath/accessibility-everywhere"
+
+[lineage]
+type = "standalone"
+parent = "Accessibility standards and tooling"
+born = "2026-03-16"
