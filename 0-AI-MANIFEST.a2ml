@@ -6,8 +6,8 @@
 - Prefer to keep generated files out of source control, and regenerate them with the documented commands before committing.
 
 ## Workflow
-1. Inspect `.machines_readable/6scm/STATE.scm` for blockers and next actions.
-2. Respect any constraints listed inside `.machines_readable/6scm/AGENTIC.scm` when tooling changes are requested.
+1. Inspect `.machines_readable/6scm/.machine_readable/6a2/STATE.a2ml` for blockers and next actions.
+2. Respect any constraints listed inside `.machines_readable/6scm/.machine_readable/6a2/AGENTIC.a2ml` when tooling changes are requested.
 3. After finishing edits, update STATE with your outcomes and commit with a concise, imperative message.
 
 ## Delivery Promises
@@ -20,12 +20,12 @@
 
 The `.machine_readable/` directory contains structured metadata required for automated reasoning and project introspection.
 
-- `STATE.scm`: Current project state, milestones, and progress.
-- `META.scm`: Architecture decisions, development methodology, and rationale.
-- `ECOSYSTEM.scm`: Ecosystem placement, upstream/downstream relationships, and interoperability.
-- `AGENTIC.scm`: AI agent interaction patterns, affordances, and constraints.
-- `NEUROSYM.scm`: Neurosymbolic integration configuration and hybrid reasoning settings.
-- `PLAYBOOK.scm`: Operational runbook, workflows, and incident procedures.
+- `.machine_readable/6a2/STATE.a2ml`: Current project state, milestones, and progress.
+- `.machine_readable/6a2/META.a2ml`: Architecture decisions, development methodology, and rationale.
+- `.machine_readable/6a2/ECOSYSTEM.a2ml`: Ecosystem placement, upstream/downstream relationships, and interoperability.
+- `.machine_readable/6a2/AGENTIC.a2ml`: AI agent interaction patterns, affordances, and constraints.
+- `.machine_readable/6a2/NEUROSYM.a2ml`: Neurosymbolic integration configuration and hybrid reasoning settings.
+- `.machine_readable/6a2/PLAYBOOK.a2ml`: Operational runbook, workflows, and incident procedures.
 
 Additional artefact:
 
