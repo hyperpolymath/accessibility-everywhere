@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+
+[project]
+name = "accessibility-everywhere"
+description = "Accessibility Everywhere"
+
+[container]
+base = "cgr.dev/chainguard/wolfi-base:latest"
+
+[build]
+builder = "deno"
