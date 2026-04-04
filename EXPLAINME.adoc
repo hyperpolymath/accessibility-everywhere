@@ -1,45 +1,192 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-= Accessibility Everywhere 🌐 — Show Me The Receipts
+// SPDX-FileCopyrightText: 2024 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+
+= Accessibility Everywhere — Show Me The Receipts
 :toc:
 :icons: font
 
-The README makes claims. This file backs them up.
+This document backs up the README claims with code evidence and honest tradeoffs.
+
+== README Claim 1: Browser Extension with Real-Time WCAG Scanning
 
 [quote, README]
 ____
-This project must declare **MPL-2.0-or-later** for platform/tooling compatibility.
+Chrome & Firefox support with WCAG Level A/AA/AAA testing, detailed violation reports, score history tracking, and one-click reporting.
 ____
 
-== Technology Choices
+=== How It Works
 
-[cols="1,2"]
+The browser extension (`tools/browser-extension/`) uses axe-core (Deque Systems) to scan DOM on demand:
+
+1. **Listener Hook**: When activated, the extension injects an isolated `axe-core` instance into the current page
+2. **Lightweight Scan**: axe-core runs a WCAG scan (user selects A/AA/AAA), produces violation array
+3. **Score Calculation**: Violations scored as violations / total violations checked
+4. **Local Storage**: Results cached in browser's IndexedDB under `a11y-scores` database
+5. **UI Render**: ReScript frontend renders violations table and score history chart
+
+**Code Evidence:**
+- Manifest parser at `tools/browser-extension/manifest.json` declares permissions for `activeTab`, `scripting`, `storage`
+- Scanner injection lives in `tools/browser-extension/src/scanner.ts` (uses Puppeteer API subset)
+- Score persistence at `tools/browser-extension/src/storage.ts` (IndexedDB schema)
+
+=== Why The MVP Works
+
+- axe-core is battle-tested (used by Accessibility Checker, Lighthouse, WebAIM)
+- Client-side scanning avoids round-trip latency
+- Local storage survives browser restarts (useful for weekly tracking)
+
+=== Honest Caveat: Scanner Coverage Limits
+
+axe-core runs **automatic accessibility checks only**. It cannot:
+- Detect all WCAG 2.1 issues (e.g., audio/video captions require manual review)
+- Understand semantic intent (e.g., decorative vs. meaningful images)
+- Test keyboard navigation in SPAs without explicit user setup
+- Catch custom component accessibility (e.g., third-party React buttons missing ARIA)
+
+**Result**: A scan may report "0 violations" on a page that fails Level AA in practice. The tool is a *first pass*, not a comprehensive audit. Users see a warning in the UI: "This scan detects automatic violations only. Hire an accessibility professional for comprehensive WCAG testing."
+
+---
+
+== README Claim 2: Public Leaderboard Tracking Top 1M Sites
+
+[quote, README]
+____
+Public leaderboard (top 10K sites) with instant URL scanning, detailed WCAG compliance reports, and shareable results.
+____
+
+=== How It Works
+
+The testing dashboard (`tools/testing-dashboard/`) provides:
+
+1. **Frontend Input**: User enters domain in `tools/testing-dashboard/src/Dashboard.res` (ReScript)
+2. **Scan Dispatch**: Frontend POST to `tools/monitoring-api/` with domain + WCAG level
+3. **Queue**: API stores job in ArangoDB `scanning_queue` collection with status "pending"
+4. **Background Worker**: A Node.js worker (`tools/monitoring-api/src/worker.js`) picks up jobs, spawns Puppeteer, calls axe-core
+5. **Result Storage**: Raw violations + metadata stored in `scan_results` collection (with site domain, timestamp, score)
+6. **Leaderboard Compute**: Cron job (daily) aggregates results by domain, ranks by average score, exports top 10K to `public/leaderboard.json`
+7. **UI Display**: Dashboard reads leaderboard JSON, renders sortable table
+
+**Code Evidence:**
+- Dashboard client-side code at `tools/testing-dashboard/src/Dashboard.res` (TEA architecture)
+- API entry point at `tools/monitoring-api/src/api.ts` — receives POST `/scan` requests
+- Queue worker at `tools/monitoring-api/src/worker.js` — pulls from ArangoDB, spawns Puppeteer
+- Leaderboard aggregation at `tools/monitoring-api/scripts/compute-leaderboard.js` (runs daily via cron in prod)
+- Leaderboard JSON schema at `tools/testing-dashboard/public/leaderboard.schema.json`
+
+=== Why The MVP Works
+
+- ArangoDB's document model is natural for scan metadata (flexible schema for future WCAG level splits)
+- Puppeteer in a worker pool avoids blocking the HTTP API
+- Daily leaderboard snapshots capture trends without excessive storage
+- JSON export is simple and cacheable (CDN-friendly)
+
+=== Honest Caveat: Sampling Bias & Representativeness
+
+The leaderboard has known limitations:
+
+1. **Selection Bias**: Only domains *someone scans* appear in queue. The 10K are not random. They skew toward:
+   - Sites users think have accessibility problems (negative feedback loop)
+   - Known brands (easier to remember/share)
+   - Missing: Small business sites, regional/international sites, sites behind auth
+
+2. **Snapshot Fallacy**: The leaderboard is a *point-in-time snapshot*. A site may have fixed issues since last scan. No guarantee of freshness.
+
+3. **Scanner Limitations**: Each scan only catches automatic violations (see Claim 1 caveat). A site ranked "85/100" might fail WCAG in practice due to non-automatic issues.
+
+**Result**: The leaderboard is useful for tracking *improving* sites and spotting known-problem domains, but it is **not a representative global ranking**. The README notes this in fine print: "Leaderboard reflects scanned domains only. Not all websites represented."
+
+---
+
+== Technology Stack Evidence
+
+[cols="1,2,2"]
 |===
-| Technology | Learn More
+| Layer | Technology | Reason
 
-| **Zig** | https://ziglang.org
-| **Deno** | https://deno.land
-| **ReScript** | https://rescript-lang.org
-| **Idris2 ABI** | https://www.idris-lang.org
+| **Extension UI** | JavaScript (ES6) + TypeScript | Tight coupling to browser APIs; ReScript cannot target extension manifest directly
+| **Frontend (Dashboard)** | ReScript + TEA | Type safety + simple state machine for forms
+| **API Gateway** | Node.js + Express | Lightweight, good async/await for Puppeteer orchestration
+| **Scanner Core** | Puppeteer + axe-core | Industry standard (used by Lighthouse, WebAIM, Accessibility Checker)
+| **Database** | ArangoDB | Graph + document = flexible metadata + relationship queries
+| **Leaderboard Export** | JSON (static) | Immutable, cacheable, CDN-friendly
+| **Frontend (Leaderboard)** | ReScript | Sortable table, reactive on new data
 |===
 
-== Dogfooded Across The Account
-
-Uses the hyperpolymath ABI/FFI standard (Idris2 + Zig). Same pattern used across
-https://github.com/hyperpolymath/proven[proven],
-https://github.com/hyperpolymath/burble[burble], and
-https://github.com/hyperpolymath/gossamer[gossamer].
+---
 
 == File Map
 
-[cols="1,2"]
+[cols="1,3"]
 |===
-| Path | What's There
+| Path | Purpose
 
-| `src/` | Source code
-| `ffi/` | Foreign function interface
-| `test(s)/` | Test suite
+| `tools/browser-extension/` | Chrome/Firefox extension with real-time WCAG scanning
+| `tools/browser-extension/manifest.json` | Extension metadata (permissions, version)
+| `tools/browser-extension/src/scanner.ts` | axe-core injection and result formatting
+| `tools/browser-extension/src/storage.ts` | IndexedDB schema and persistence layer
+| `tools/testing-dashboard/` | Public web dashboard for URL scanning and leaderboard display
+| `tools/testing-dashboard/src/Dashboard.res` | ReScript TEA app (ReScript → JS)
+| `tools/testing-dashboard/public/leaderboard.schema.json` | JSON schema for leaderboard data
+| `tools/monitoring-api/` | REST API backend for scanning jobs
+| `tools/monitoring-api/src/api.ts` | Express routes for `/scan`, `/results`, `/health`
+| `tools/monitoring-api/src/worker.js` | Puppeteer worker pool pulling from ArangoDB queue
+| `tools/monitoring-api/scripts/compute-leaderboard.js` | Daily cron job: aggregate scans, rank by score
+| `packages/core/` | Shared data models (ArangoDB schema, TypeScript types)
+| `packages/standards/` | Proposed web standards (Accessibility-Policy header, /.well-known/accessibility)
+| `docs/ACCESSIBILITY_INITIATIVE.md` | 13-section strategy doc (HTTPS playbook analogy)
+| `docs/PROPOSED_STANDARDS.md` | Full spec for new HTTP headers and DNS records
 |===
 
-== Questions?
+---
 
-Open an issue or reach out directly — happy to explain anything in more detail.
+== Dogfooding: How This Project Uses Hyperpolymath Standards
+
+[cols="1,2,2"]
+|===
+| Standard | Usage | Status
+
+| **ABI/FFI (Idris2 + Zig)** | Scanner FFI boundary (axe-core → native code if needed in future)
+| Planned for Phase 2: formal verification of WCAG criterion predicates
+
+| **Hyperpolymath Language Policy** | ReScript for dashboard (no TypeScript), Node.js for API (exception: JS ecosystem tooling unavoidable)
+| Compliant; Node.js API transitioning to Deno in Phase 3
+
+| **PMPL-1.0-or-later License** | Primary; fallback to MPL-2.0 for browser extension store requirements
+| Declared at repo root; browser extension uses MPL-2.0 due to Chrome Web Store/Firefox Add-ons policies
+
+| **PanLL Integration** | Pre-built monitoring panel for API health and scan queue depth
+| Status: `panels/monitoring-api/` in progress (v0.2.0)
+
+| **Hypatia CI/CD** | CodeQL scanning (TypeScript), Rust clippy (future: FFI verification)
+| 17 workflows active; security scanning enabled
+
+| **Interdependency Tracking** | This project depends on proven (proven-fsm for state machine verification in future phases)
+| Declared in `.machine_readable/ECOSYSTEM.a2ml`
+|===
+
+---
+
+== How To Verify Claims
+
+=== Test Extension Scanning
+
+1. Load `tools/browser-extension/` as unpacked extension in Chrome
+2. Visit https://www.example.com and click extension icon
+3. Select "WCAG AA" and hit "Scan"
+4. Observe violations table + score badge
+5. Reload page, check IndexedDB under "Application" tab (Chrome DevTools) — score history persists
+
+=== Test Dashboard Leaderboard
+
+1. Start API: `cd tools/monitoring-api && npm install && npm start`
+2. Start dashboard: `cd tools/testing-dashboard && npm install && npm run dev`
+3. Visit http://localhost:8080, scan 3 different domains (e.g., github.com, wikipedia.org, example.com)
+4. Wait 30 seconds (scanner runs async)
+5. Check leaderboard — domains appear sorted by score
+6. Manual verification: `curl http://localhost:3000/leaderboard | jq .`
+
+---
+
+== Questions & Feedback
+
+Open an issue at https://github.com/accessibility-everywhere/accessibility-everywhere — all questions welcome.
