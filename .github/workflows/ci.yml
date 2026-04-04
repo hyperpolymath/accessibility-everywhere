@@ -202,9 +202,34 @@ jobs:
 
 
   # Summary
+  deno-test:
+    name: Deno Tests (E2E / Property / Aspect)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.1
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@e95548e56dfa95d4e1a28d6f422fafe75c4c26fb # v2.0.3
+        with:
+          deno-version: v2.x
+
+      - name: Run CLI tests
+        run: deno test --allow-net --allow-read --allow-env --allow-run tools/cli/tests/
+
+      - name: Run monitoring-api E2E tests
+        run: deno test --allow-net --allow-read --allow-env tools/monitoring-api/tests/e2e/
+
+      - name: Run monitoring-api property tests
+        run: deno test --allow-net --allow-read --allow-env tools/monitoring-api/tests/property/
+
+      - name: Run monitoring-api security tests
+        run: deno test --allow-net --allow-read --allow-env tools/monitoring-api/tests/aspect/
+
   ci-summary:
     name: CI Summary
-    needs: [rsr-compliance, lint, typecheck, build, test, security, docker, a11y]
+    needs: [rsr-compliance, lint, typecheck, build, test, security, docker, a11y, deno-test]
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -218,3 +243,4 @@ jobs:
           echo "Security: ${{ needs.security.result }}"
           echo "Docker: ${{ needs.docker.result }}"
           echo "Accessibility: ${{ needs.a11y.result }}"
+          echo "Deno Tests: ${{ needs.deno-test.result }}"
