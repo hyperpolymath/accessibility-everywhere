@@ -3,6 +3,8 @@
 # Usage: just <recipe>
 
 # Default recipe (runs when you type "just" with no arguments)
+import? "contractile.just"
+
 default:
     @just --list
 
