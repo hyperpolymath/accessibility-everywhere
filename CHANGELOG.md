@@ -19,5 +19,5 @@ abdbef5 chore: commit local changes for sync
 3eb6936 Add SCM metadata files (STATE, META, ECOSYSTEM)
 3a6a4a7 Update license to Palimpsest-MPL-1.0
 a6dbcd0 Resolve all TODOs and stubs in codebase (#3)
-9d80820 chore: rename justfile to Justfile for consistency
+9d80820 chore: rename Justfile to Justfile for consistency
 56210ef Remove CHANGELOG.md (converted to CHANGELOG.adoc)
