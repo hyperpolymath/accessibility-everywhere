@@ -1,0 +1,47 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# Stapeln service definition for accessibility-everywhere
+#
+# Usage:
+#   podman-compose -f selur-compose.toml up -d
+#   just stack-up
+
+[project]
+name = "accessibility-everywhere"
+
+[services.arangodb]
+image = "arangodb:latest"
+restart = "unless-stopped"
+networks = ["default"]
+environment = { ARANGO_ROOT_PASSWORD = "${ARANGO_ROOT_PASSWORD:-development}" }
+ports = ["8529:8529"]
+volumes = [
+  "arangodb_data:/var/lib/arangodb3",
+  "arangodb_apps:/var/lib/arangodb3-apps",
+  "./scripts/arangodb-init:/docker-entrypoint-initdb.d",
+]
+
+[services.api]
+build = { context = ".", dockerfile = "tools/monitoring-api/Dockerfile" }
+restart = "unless-stopped"
+networks = ["default"]
+environment = { NODE_ENV = "production", ARANGO_URL = "https://arangodb:8529", ARANGO_DATABASE = "accessibility", ARANGO_USERNAME = "root", ARANGO_PASSWORD = "${ARANGO_ROOT_PASSWORD:-development}", PORT = "3000" }
+ports = ["3000:3000"]
+healthcheck = { test = ["CMD", "curl", "-f", "http://localhost:3000/health"], interval = "30s", timeout = "5s", retries = 3 }
+
+[services.dashboard]
+build = { context = ".", dockerfile = "tools/testing-dashboard/Dockerfile" }
+restart = "unless-stopped"
+networks = ["default"]
+ports = ["8080:80"]
+
+[services.scanner]
+build = { context = ".", dockerfile = "tools/adoption-tracker/Dockerfile" }
+restart = "unless-stopped"
+networks = ["default"]
+environment = { ARANGO_URL = "https://arangodb:8529", ARANGO_DATABASE = "accessibility", ARANGO_USERNAME = "root", ARANGO_PASSWORD = "${ARANGO_ROOT_PASSWORD:-development}" }
+
+[volumes]
+arangodb_data = {}
+arangodb_apps = {}
