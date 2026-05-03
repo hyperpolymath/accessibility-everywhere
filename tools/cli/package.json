@@ -2,28 +2,26 @@
   "name": "@accessibility-everywhere/cli",
   "version": "1.0.0",
   "description": "Command-line tool for accessibility scanning",
-  "main": "dist/index.js",
+  "main": "src/Cli.mjs",
+  "type": "module",
   "bin": {
-    "a11y-scan": "dist/cli.js",
-    "accessibility-scan": "dist/cli.js"
+    "a11y-scan": "src/Cli.mjs",
+    "accessibility-scan": "src/Cli.mjs"
   },
   "scripts": {
-    "build": "tsc",
-    "dev": "ts-node src/cli.ts",
-    "test": "jest"
+    "build": "rescript build",
+    "dev": "rescript build -w",
+    "clean": "rescript clean"
   },
   "dependencies": {
-    "@accessibility-everywhere/scanner": "^1.0.0",
     "commander": "^11.1.0",
-    "chalk": "^4.1.2",
-    "ora": "^5.4.1",
+    "chalk": "^5.3.0",
+    "ora": "^7.0.1",
     "cli-table3": "^0.6.3",
     "fs-extra": "^11.2.0"
   },
   "devDependencies": {
-    "@types/node": "^20.10.0",
-    "@types/fs-extra": "^11.0.4",
-    "typescript": "^5.3.2",
-    "ts-node": "^10.9.2"
+    "rescript": "^11.1.0",
+    "@rescript/core": "^1.5.0"
   }
 }
