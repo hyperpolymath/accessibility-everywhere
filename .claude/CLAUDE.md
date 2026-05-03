@@ -81,3 +81,12 @@ Both are FOSS with independent governance (no Big Tech).
 - SHA-pinned dependencies
 - SPDX license headers on all files
 
+### TypeScript Exemptions (Approved)
+
+The hyperpolymath "no new TypeScript" policy has the following approved exemptions in this repo. These are *not* policy violations — they are documented carve-outs.
+
+| Path | Files | Rationale | Unblock condition |
+|---|---|---|---|
+| `tools/**/*.ts` | 13 | tools/ subdirectory: monitoring-api (Express), stale scanner (Node CLI), github-action (Octokit). Each tool depends on a Node-native library that does not yet have an AffineScript binding. | AffineScript Node-target codegen (affinescript#35) + per-tool bindings (Octokit, Express, ArangoDB driver). |
+
+Adding to this list requires explicit user approval and an unblock condition. New TypeScript files outside this list are blocked by the RSR antipattern check.
