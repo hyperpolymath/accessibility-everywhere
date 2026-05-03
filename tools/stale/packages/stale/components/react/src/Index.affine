@@ -1,0 +1,37 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+//
+// Public surface for @accessibility-everywhere/react.
+//
+// Migration status: Button is the AffineScript pilot per the migration-playbook.
+// Modal stays as Modal.tsx in this revision — its focus-trap + portal + scroll-
+// lock + escape-handler bundle needs deeper effect-modelling (see PORTING_NOTES
+// at the bottom of this file), and is the next session's work.
+
+// Re-export Button surface
+type ButtonVariant = Primary | Secondary | Ghost | Danger
+type ButtonSize    = Sm | Md | Lg
+
+// Library version + WCAG conformance level (these are pure data; effect-free).
+let version: String   = "1.0.0"
+let wcag_level: String = "AA"
+
+// ── PORTING_NOTES for Modal (next session) ────────────────────────────────────
+//
+// Modal.tsx's React patterns and their planned AffineScript decomposition:
+//
+//   * `useEffect` portal mounting           → `own Portal` resource attached at
+//                                              construction; dropped on unmount
+//   * `useEffect` escape-key listener       → `own KeyboardSubscription` bound
+//                                              to the body, lifetime = modal
+//   * `useEffect` focus trap (Tab/Shift-Tab) → same as above; one subscription
+//   * `useEffect` scroll lock                → `own BodyScrollLock` resource;
+//                                              drop restores `body.style.overflow`
+//   * `useEffect` previous-focus restoration → captured-once Element ref stored
+//                                              on the `own Modal` record
+//   * `useId`                                 → effect `Id { fn fresh() -> String }`
+//   * `useState(mounted)`                     → no equivalent; SSR-portal toggling
+//                                              is irrelevant outside React
+//
+// In short: every "useEffect cleanup" becomes a Drop-on-own resource. The React
+// effect-with-cleanup idiom maps cleanly onto AffineScript ownership: when the
+// `own Modal` is dropped, all its sub-resources are released in declared order.

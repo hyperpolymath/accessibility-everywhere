@@ -1,0 +1,196 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+//
+// Button — accessible button, WCAG 2.1 AA.
+//
+// Re-decomposed from React.forwardRef(Button.tsx) per the AffineScript
+// migration playbook (Cardinal Rule: re-decompose, don't transliterate).
+//
+// Source-pattern decomposition applied here:
+//   * `class` / `forwardRef`           → standalone `make_button` fn returning own Element
+//   * `useEffect` for class wiring     → straight-line construction; no lifecycle needed
+//   * `'primary' | 'secondary' | …`    → sum types (ButtonVariant, ButtonSize)
+//   * `Props extends HTMLButtonAttrs`  → curated record; the HTML-attr "spread" escape
+//                                        hatch is dropped — callers compose by mutating
+//                                        the returned `own Element`
+//   * `iconBefore?: ReactNode`         → `Option[own Element]`; caller pre-builds the icon
+//   * Exception path on missing args   → defaulted via `default_button_props`
+//
+// Effect annotation: every DOM mutation is `IO` here. Once @affinescript/dom
+// publishes a typed `DOM` effect, swap the `/ IO` rows below to `/ DOM`.
+
+// ── DOM FFI (inline; replace with `import @affinescript/dom` once that package
+// ── has a stable surface and a real cross-package import story in this repo)
+
+extern type Element;
+extern type Event;
+
+extern fn createElement(tag: ref String) -> own Element / IO;
+extern fn createTextNode(text: ref String) -> own Element / IO;
+extern fn setAttribute(el: mut Element, name: ref String, value: ref String) -> () / IO;
+extern fn appendChild(parent: mut Element, child: own Element) -> () / IO;
+extern fn addEventListener(
+  el: mut Element,
+  event: ref String,
+  handler: fn(Event) -> () / IO
+) -> () / IO;
+
+// ── Domain types ──────────────────────────────────────────────────────────────
+
+type ButtonVariant = Primary | Secondary | Ghost | Danger
+type ButtonSize    = Sm | Md | Lg
+
+// `text` is mandatory (the visible label). Icons and click handler are optional
+// — `Option[…]` makes that visible at the call site, replacing the React
+// "undefined-by-omission" model.
+type ButtonProps = own {
+  variant: ButtonVariant,
+  size: ButtonSize,
+  loading: Bool,
+  disabled: Bool,
+  class_extra: String,            // appended to the computed class list
+  button_type: String,            // "button" | "submit" | "reset"
+  aria_label: Option[String],
+  on_click: Option[fn(Event) -> () / IO],
+  text: own Element,              // pre-built label (text node or richer subtree)
+  icon_before: Option[own Element],
+  icon_after: Option[own Element],
+}
+
+fn default_button_props(text: own Element) -> own ButtonProps {
+  ButtonProps {
+    variant: Primary,
+    size: Md,
+    loading: false,
+    disabled: false,
+    class_extra: "",
+    button_type: "button",
+    aria_label: None,
+    on_click: None,
+    text: text,
+    icon_before: None,
+    icon_after: None,
+  }
+}
+
+// ── Class-name helpers (pure) ─────────────────────────────────────────────────
+
+fn variant_class(v: ref ButtonVariant) -> String {
+  match v {
+    Primary   => "a11y-button--primary"
+    Secondary => "a11y-button--secondary"
+    Ghost     => "a11y-button--ghost"
+    Danger    => "a11y-button--danger"
+  }
+}
+
+fn size_class(s: ref ButtonSize) -> String {
+  match s {
+    Sm => "a11y-button--sm"
+    Md => "a11y-button--md"
+    Lg => "a11y-button--lg"
+  }
+}
+
+fn loading_class(loading: Bool) -> String {
+  if loading { "a11y-button--loading" } else { "" }
+}
+
+// Joins non-empty parts with single spaces.
+// (Stdlib presumably has String.join; this is a sketch using concat operators.)
+fn join_classes(
+  base: ref String,
+  v: ref String,
+  s: ref String,
+  l: ref String,
+  extra: ref String
+) -> String {
+  let with_v  = if v == ""     { base   } else { base   ++ " " ++ v };
+  let with_s  = if s == ""     { with_v } else { with_v ++ " " ++ s };
+  let with_l  = if l == ""     { with_s } else { with_s ++ " " ++ l };
+  let with_e  = if extra == "" { with_l } else { with_l ++ " " ++ extra };
+  with_e
+}
+
+// ── The builder ───────────────────────────────────────────────────────────────
+//
+// Returns an owned button element. The caller is responsible for mounting it
+// (via @affinescript/dom's `mount`) and ultimately for letting it drop, which
+// the runtime will detach from the live DOM.
+
+fn make_button(props: own ButtonProps) -> own Element / IO {
+  let busy: Bool = props.disabled || props.loading;
+
+  let classes: String = join_classes(
+    "a11y-button",
+    variant_class(props.variant),
+    size_class(props.size),
+    loading_class(props.loading),
+    props.class_extra,
+  );
+
+  let btn = createElement("button");
+  setAttribute(btn, "type", props.button_type);
+  setAttribute(btn, "class", classes);
+
+  if busy {
+    setAttribute(btn, "disabled", "");
+    setAttribute(btn, "aria-disabled", "true");
+  }
+
+  if props.loading {
+    setAttribute(btn, "aria-busy", "true");
+  }
+
+  match props.aria_label {
+    Some(label) => setAttribute(btn, "aria-label", label)
+    None => ()
+  }
+
+  match props.on_click {
+    Some(handler) => addEventListener(btn, "click", handler)
+    None => ()
+  }
+
+  // Children, in order:
+  //   loading: spinner only (icons + text suppressed)
+  //   else:    [icon_before?] text [icon_after?]
+  if props.loading {
+    let spinner = createElement("span");
+    setAttribute(spinner, "class", "a11y-button__spinner");
+    setAttribute(spinner, "aria-hidden", "true");
+    appendChild(btn, spinner);
+  } else {
+    match props.icon_before {
+      Some(icon) => {
+        let wrap = createElement("span");
+        setAttribute(wrap, "class", "a11y-button__icon-before");
+        setAttribute(wrap, "aria-hidden", "true");
+        appendChild(wrap, icon);
+        appendChild(btn, wrap);
+      }
+      None => ()
+    }
+  }
+
+  // Text wrapper is always present (loading just hides icons, not the label
+  // — preserves layout stability per WCAG 2.1.4.13 advisory).
+  let text_wrap = createElement("span");
+  setAttribute(text_wrap, "class", "a11y-button__text");
+  appendChild(text_wrap, props.text);
+  appendChild(btn, text_wrap);
+
+  if !props.loading {
+    match props.icon_after {
+      Some(icon) => {
+        let wrap = createElement("span");
+        setAttribute(wrap, "class", "a11y-button__icon-after");
+        setAttribute(wrap, "aria-hidden", "true");
+        appendChild(wrap, icon);
+        appendChild(btn, wrap);
+      }
+      None => ()
+    }
+  }
+
+  btn
+}
