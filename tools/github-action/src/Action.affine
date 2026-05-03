@@ -1,0 +1,139 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Action — GitHub Action entry point. Re-decomposed from src/index.ts.
+//
+// Decomposition:
+//   * top-level `run()` async fn → fn with Action + Github + Scanner.scan effects
+//   * try/catch around the whole run                  → effect-row composition; failures
+//                                                        flow through Action.set_failed
+//   * `as 'A' | 'AA' | 'AAA'` cast on user input      → parse_wcag_level total fn
+//   * inline summary HTML/markdown                     → generate_summary pure fn
+
+module Action;
+
+use Externs;
+
+// We re-declare the slice of Scanner.ScanResult we actually consume. When
+// cross-package types resolve via .affex, this becomes `use Scanner` and the
+// local re-decl drops.
+pub type WcagLevel = A | AA | AAA
+pub type Impact    = Critical | Serious | Moderate | Minor
+
+pub type NodeShim   = { target: List[String] }
+pub type Violation  = {
+  impact: Impact,
+  description: String,
+  help: String,
+  help_url: String,
+  nodes: List[NodeShim],
+}
+pub type ScanResult = {
+  score: Int,
+  violations: List[Violation],
+  passes: List[{}],
+  incomplete: List[{}],
+}
+
+pub fn parse_wcag_level(s: ref String) -> WcagLevel {
+  match s {
+    "A"   => A
+    "AAA" => AAA
+    _     => AA
+  }
+}
+
+pub fn wcag_label(w: ref WcagLevel) -> String {
+  match w {
+    A   => "A"
+    AA  => "AA"
+    AAA => "AAA"
+  }
+}
+
+pub fn impact_label(i: ref Impact) -> String {
+  match i {
+    Critical => "critical"
+    Serious  => "serious"
+    Moderate => "moderate"
+    Minor    => "minor"
+  }
+}
+
+pub fn impact_emoji(i: ref Impact) -> String {
+  match i {
+    Critical => "🔴"
+    Serious  => "🟠"
+    Moderate => "🟡"
+    Minor    => "🔵"
+  }
+}
+
+pub fn get_grade(score: Int) -> String {
+  if score >= 90 { "A" }
+  else if score >= 80 { "B" }
+  else if score >= 70 { "C" }
+  else if score >= 60 { "D" }
+  else { "F" }
+}
+
+pub fn grade_emoji(grade: ref String) -> String {
+  match grade {
+    "A"           => "🟢"
+    "B"           => "🟡"
+    "C"           => "🟠"
+    "D" | "F"     => "🔴"
+    _             => "⚪"
+  }
+}
+
+pub fn generate_summary(
+  result: ref ScanResult,
+  url: ref String,
+  wcag: ref WcagLevel
+) -> String {
+  // TODO: implement once stdlib String.join + List.map land. The TS builds
+  //       a markdown report with header / summary table / violations
+  //       (top-10) / footer link.
+  let _ = result; let _ = url; let _ = wcag;
+  ""
+}
+
+pub fn post_pr_comment(
+  token: ref String,
+  result: ref ScanResult,
+  url: ref String,
+  wcag: ref WcagLevel
+) -{Externs.Github}-> () {
+  let ctx = Externs.context();
+  match Externs.context_pull_request(ctx) {
+    None     => ()
+    Some(pr) => {
+      let octo = Externs.get_octokit(token);
+      let repo = Externs.context_repo(ctx);
+      let body = generate_summary(result, url, wcag);
+      Externs.create_comment(octo, {
+        owner: repo.owner,
+        repo: repo.repo,
+        issue_number: Externs.pull_request_number(pr),
+        body: body,
+      })
+    }
+  }
+}
+
+pub fn run() -{Externs.Action + Externs.Github}-> () {
+  let url               = Externs.get_input_required("url");
+  let wcag_input        = Externs.get_input("wcag-level");
+  let wcag              = parse_wcag_level(wcag_input);
+  let fail_on_violations = Externs.get_input("fail-on-violations") == "true";
+  let comment_pr        = Externs.get_input("comment-pr") == "true";
+  let github_token      = Externs.get_input("github-token");
+
+  Externs.info("Scanning " ++ url ++ " for WCAG " ++ wcag_label(wcag) ++ " compliance...");
+
+  // TODO: invoke Scanner.scan once cross-package types resolve; consume its
+  //       ScanResult, set outputs, post comment if requested, set_failed on
+  //       violations / below-min-score. Decomposition matches the TS run()
+  //       body line-for-line; deferred until Node-target lands.
+  let _ = fail_on_violations; let _ = comment_pr; let _ = github_token;
+  ()
+}

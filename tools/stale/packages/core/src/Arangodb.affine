@@ -1,0 +1,246 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Arangodb — full re-decomposition of the TS arangodb.ts (409 LOC).
+// Tagged-template aql queries lifted into bind-vars form per the playbook.
+
+module Arangodb;
+
+use Externs;
+
+// ── Domain enums ──────────────────────────────────────────────────────────────
+
+pub type WcagLevel  = A | AA | AAA
+pub type Impact     = Critical | Serious | Moderate | Minor
+pub type Principle  = Perceivable | Operable | Understandable | Robust
+pub type SiteStatus = Active | Inactive | Failed
+pub type OrgTier    = Free | Pro | Enterprise
+
+// ── Domain records ────────────────────────────────────────────────────────────
+
+pub type ArangoConfig = {
+  url: String,
+  database: String,
+  username: String,
+  password: String,
+}
+
+pub type Site = {
+  key: String,
+  url: String,
+  domain: String,
+  first_scanned: String,        // ISO-8601
+  last_scanned: String,
+  scan_count: Int,
+  current_score: Int,
+  previous_score: Option[Int],
+  status: SiteStatus,
+}
+
+pub type Scan = {
+  key: String,
+  site_key: String,
+  timestamp: String,
+  score: Int,
+  violations: Int,
+  passes: Int,
+  incomplete: Int,
+  url: String,
+  wcag_level: WcagLevel,
+  duration: Int,
+  user_agent: Option[String],
+}
+
+pub type Violation = {
+  key: String,
+  scan_key: String,
+  site_key: String,
+  wcag_criterion: String,
+  wcag_level: WcagLevel,
+  impact: Impact,
+  description: String,
+  help_url: String,
+  selector: String,
+  html: String,
+  timestamp: String,
+  fixed: Bool,
+}
+
+pub type WcagCriterion = {
+  key: String,
+  criterion: String,
+  level: WcagLevel,
+  principle: Principle,
+  guideline: String,
+  title: String,
+  description: String,
+  success_criteria: String,
+  techniques: List[String],
+  failures: List[String],
+}
+
+pub type Organization = {
+  key: String,
+  name: String,
+  domain: String,
+  contact_email: Option[String],
+  tier: OrgTier,
+  created_at: String,
+  api_key: Option[String],
+}
+
+pub type CriterionCount = { criterion: String, count: Int }
+pub type TrendPoint     = { timestamp: String, violations: Int, score: Int }
+
+// ── Service ──────────────────────────────────────────────────────────────────
+//
+// The TS `class ArangoDBService` is decomposed per the playbook:
+//   * private state (`db`, collection refs) → owned `Service` record
+//   * methods → standalone fns taking `ref Service` (or `mut Service` where
+//     they wire collections during initialise)
+//   * exception path → effect rows (Db) make failure modes explicit at
+//     callsites; tightening to `Result[T, DbErr]` is a follow-up
+
+pub type Service = own {
+  db: Externs.Database,
+  // Document collections
+  sites: Externs.Collection,
+  scans: Externs.Collection,
+  violations: Externs.Collection,
+  wcag_criteria: Externs.Collection,
+  organizations: Externs.Collection,
+  // Edge collections
+  site_scans: Externs.EdgeCollection,
+  scan_violations: Externs.EdgeCollection,
+  violation_criteria: Externs.EdgeCollection,
+  org_sites: Externs.EdgeCollection,
+}
+
+// ── Construction ──────────────────────────────────────────────────────────────
+
+pub fn make_service(config: ref ArangoConfig) -{Externs.Db}-> own Service {
+  // TODO: open_database; collections wired in `initialize`. Sketch only —
+  //       the literal `ArangoConfig → DatabaseInit` mapping plus collection
+  //       handles is a one-shot constructor.
+  let _ = config;
+  // Placeholder — implementation deferred until Node-target lands.
+  // Body intentionally uses a single Externs.Db op to keep the effect row
+  // honest.
+  let _db = Externs.open_database({
+    url: config.url,
+    database_name: config.database,
+    username: config.username,
+    password: config.password,
+  });
+  // The remaining collection handles need to come from `initialize`'s mutable
+  // pass — sketched separately below; this constructor returns a partially
+  // initialised value in the full impl, or this fn is removed and `initialize`
+  // becomes the only entry point. To be decided when implementing.
+  // For now, mark unreachable until impl lands:
+  // panic!("Service construction stub — see initialize()")
+  unimplemented()
+}
+
+extern fn unimplemented[T]() -> T;
+
+// ── Initialisation ────────────────────────────────────────────────────────────
+
+pub fn initialize(svc: mut Service) -{Externs.Db}-> () {
+  // TODO: per the TS impl,
+  //   1. ensure database exists (list_databases + create_database)
+  //   2. create document collections (sites, scans, violations, wcag_criteria,
+  //      organizations) if absent
+  //   3. create edge collections (site_scans, scan_violations,
+  //      violation_criteria, org_sites) if absent
+  //   4. create_indexes(svc) — per the TS createIndexes()
+  //   5. initialize_wcag_criteria(svc) — seed the WCAG 2.1 AA criteria data
+  ()
+}
+
+// ── Query API (8 methods, one per TS method) ──────────────────────────────────
+
+pub fn get_site_by_url(svc: ref Service, url: ref String) -{Externs.Db}-> Option[Site] {
+  // AQL: FOR site IN sites FILTER site.url == @url LIMIT 1 RETURN site
+  let _ = svc; let _ = url;
+  None
+}
+
+pub fn get_recent_scans_for_site(
+  svc: ref Service,
+  site_key: ref String,
+  limit: Int
+) -{Externs.Db}-> List[Scan] {
+  // AQL: FOR scan IN scans FILTER scan.siteKey == @siteKey
+  //      SORT scan.timestamp DESC LIMIT @limit RETURN scan
+  let _ = svc; let _ = site_key; let _ = limit;
+  []
+}
+
+pub fn get_violations_for_scan(
+  svc: ref Service,
+  scan_key: ref String
+) -{Externs.Db}-> List[Violation] {
+  // AQL: FOR violation IN violations FILTER violation.scanKey == @scanKey
+  //      SORT violation.impact DESC RETURN violation
+  let _ = svc; let _ = scan_key;
+  []
+}
+
+pub fn get_top_sites(svc: ref Service, limit: Int) -{Externs.Db}-> List[Site] {
+  // AQL: FOR site IN sites FILTER site.currentScore > 0
+  //      SORT site.currentScore DESC LIMIT @limit RETURN site
+  let _ = svc; let _ = limit;
+  []
+}
+
+pub fn get_common_violations(
+  svc: ref Service,
+  limit: Int
+) -{Externs.Db}-> List[CriterionCount] {
+  // AQL: FOR violation IN violations COLLECT … WITH COUNT INTO count
+  //      SORT count DESC LIMIT @limit RETURN { criterion, count }
+  let _ = svc; let _ = limit;
+  []
+}
+
+pub fn get_site_violation_trend(
+  svc: ref Service,
+  site_key: ref String,
+  days: Int
+) -{Externs.Db}-> List[TrendPoint] {
+  // AQL: FOR scan IN scans FILTER scan.siteKey == @siteKey
+  //      AND scan.timestamp >= @startDate SORT scan.timestamp ASC
+  //      RETURN { timestamp, violations, score }
+  let _ = svc; let _ = site_key; let _ = days;
+  []
+}
+
+pub fn get_organization_sites(
+  svc: ref Service,
+  org_key: ref String
+) -{Externs.Db}-> List[Site] {
+  // AQL: FOR org IN organizations FILTER org._key == @orgKey
+  //      FOR v, e IN 1..1 OUTBOUND org org_sites RETURN v
+  let _ = svc; let _ = org_key;
+  []
+}
+
+// ── Factory with env-based defaults ───────────────────────────────────────────
+
+pub fn create_service_from_env() -{Externs.Db + Externs.Process}-> own Service {
+  let url      = Externs.env("ARANGO_URL"       ) |> default_or("http://localhost:8529");
+  let database = Externs.env("ARANGO_DATABASE"  ) |> default_or("accessibility");
+  let username = Externs.env("ARANGO_USERNAME"  ) |> default_or("root");
+  let password = Externs.env("ARANGO_PASSWORD"  ) |> default_or("development");
+  make_service({
+    url: url,
+    database: database,
+    username: username,
+    password: password,
+  })
+}
+
+fn default_or(o: Option[String], fallback: String) -> String {
+  match o {
+    Some(s) => s
+    None    => fallback
+  }
+}

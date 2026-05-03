@@ -1,0 +1,123 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Scanner — multi-engine accessibility audit kernel.
+// Re-decomposed per the AffineScript migration playbook.
+
+module Scanner;
+
+use Externs;
+
+// ── Domain enums ──────────────────────────────────────────────────────────────
+
+pub type WcagLevel = A | AA | AAA
+pub type Engine    = Puppeteer | Playwright
+pub type Impact    = Critical | Serious | Moderate | Minor
+
+// ── Domain records ────────────────────────────────────────────────────────────
+
+pub type ScanOptions = {
+  url: String,
+  wcag_level: WcagLevel,
+  screenshot: Bool,
+  engine: Engine,
+}
+
+pub type NodeDetail = {
+  html: String,
+  target: List[String],
+  failure_summary: Option[String],
+}
+
+pub type ViolationDetail = {
+  id: String,
+  impact: Impact,
+  description: String,
+  help: String,
+  help_url: String,
+  tags: List[String],
+  nodes: List[NodeDetail],
+}
+
+pub type PassDetail = {
+  id: String,
+  description: String,
+  help: String,
+  tags: List[String],
+  nodes: List[NodeDetail],
+}
+
+pub type IncompleteDetail = {
+  id: String,
+  description: String,
+  help: String,
+  nodes: List[NodeDetail],
+}
+
+pub type InapplicableDetail = {
+  id: String,
+  description: String,
+  help: String,
+}
+
+pub type ScanResult = {
+  url: String,
+  timestamp: String,
+  score: Int,
+  duration_ms: Int,
+  wcag_level: WcagLevel,
+  violations: List[ViolationDetail],
+  passes: List[PassDetail],
+  incomplete: List[IncompleteDetail],
+  inapplicable: List[InapplicableDetail],
+  screenshot: Option[String],
+}
+
+// The scanner instance carries the loaded axe.min.js source for injection.
+pub type Scanner = own {
+  axe_source: String,
+}
+
+// ── Public API ────────────────────────────────────────────────────────────────
+
+pub fn make_scanner() -{Externs.Fs}-> own Scanner {
+  let path = Externs.require_resolve("axe-core/axe.min.js");
+  let src  = Externs.read_file_sync(path);
+  Scanner { axe_source: src }
+}
+
+// SCORING KERNEL: penalty weights per impact:
+//   Critical = 10, Serious = 5, Moderate = 3, Minor = 1.
+pub fn calculate_score(violations: ref List[ViolationDetail]) -> Int {
+  // TODO: implement weighted score aggregation when AffineScript Node-target
+  //       lands and stdlib List/fold operations are settled.
+  100
+}
+
+pub fn scan(
+  scanner: ref Scanner,
+  opts: ref ScanOptions
+) -{Externs.Browser + Externs.Clock}-> ScanResult {
+  // TODO: implement once Node-target lands. The decomposition:
+  //   1. Externs.Clock.now_ms() to capture start
+  //   2. Externs.Browser.launch with sandbox-disabled args
+  //   3. new_page + goto(opts.url)
+  //   4. evaluate_with_source(page, scanner.axe_source ++ axe_run_template)
+  //   5. optional screenshot when opts.screenshot
+  //   6. close(browser)
+  //   7. calculate_score over violations; assemble ScanResult
+  //
+  // Engine dispatch (Puppeteer | Playwright) lives behind the single
+  // Externs.Browser effect — Externs implementation chooses the engine
+  // when bound at the call site.
+  ScanResult {
+    url: opts.url,
+    timestamp: "1970-01-01T00:00:00Z",
+    score: 0,
+    duration_ms: 0,
+    wcag_level: opts.wcag_level,
+    violations: [],
+    passes: [],
+    incomplete: [],
+    inapplicable: [],
+    screenshot: None,
+  }
+}

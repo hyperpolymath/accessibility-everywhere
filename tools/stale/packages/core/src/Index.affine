@@ -1,0 +1,63 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Public surface for @accessibility-everywhere/core.
+
+module Index;
+
+use Arangodb;
+
+pub type WcagLevel       = Arangodb.WcagLevel
+pub type Impact          = Arangodb.Impact
+pub type SiteStatus      = Arangodb.SiteStatus
+pub type Site            = Arangodb.Site
+pub type Scan            = Arangodb.Scan
+pub type Violation       = Arangodb.Violation
+pub type Service         = Arangodb.Service
+pub type ArangoConfig    = Arangodb.ArangoConfig
+pub type CriterionCount  = Arangodb.CriterionCount
+pub type TrendPoint      = Arangodb.TrendPoint
+
+pub fn create_arango_db_service() -{Externs.Db + Externs.Process}-> own Service {
+  Arangodb.create_service_from_env()
+}
+
+pub fn initialize(svc: mut Service) -{Externs.Db}-> () {
+  Arangodb.initialize(svc)
+}
+
+pub fn get_site_by_url(svc: ref Service, url: ref String) -{Externs.Db}-> Option[Site] {
+  Arangodb.get_site_by_url(svc, url)
+}
+
+pub fn get_recent_scans_for_site(
+  svc: ref Service, site_key: ref String, limit: Int
+) -{Externs.Db}-> List[Scan] {
+  Arangodb.get_recent_scans_for_site(svc, site_key, limit)
+}
+
+pub fn get_violations_for_scan(
+  svc: ref Service, scan_key: ref String
+) -{Externs.Db}-> List[Violation] {
+  Arangodb.get_violations_for_scan(svc, scan_key)
+}
+
+pub fn get_top_sites(svc: ref Service, limit: Int) -{Externs.Db}-> List[Site] {
+  Arangodb.get_top_sites(svc, limit)
+}
+
+pub fn get_common_violations(
+  svc: ref Service, limit: Int
+) -{Externs.Db}-> List[CriterionCount] {
+  Arangodb.get_common_violations(svc, limit)
+}
+
+pub fn get_site_violation_trend(
+  svc: ref Service, site_key: ref String, days: Int
+) -{Externs.Db}-> List[TrendPoint] {
+  Arangodb.get_site_violation_trend(svc, site_key, days)
+}
+
+pub fn get_organization_sites(
+  svc: ref Service, org_key: ref String
+) -{Externs.Db}-> List[Site] {
+  Arangodb.get_organization_sites(svc, org_key)
+}

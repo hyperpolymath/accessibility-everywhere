@@ -1,0 +1,38 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Externs — compatibility shim for @accessibility-everywhere/scanner.
+// TODO: migrate to .affex once that filesystem is specified.
+
+module Externs;
+
+// ── Headless-browser opaque types (puppeteer + playwright dual-engine) ────────
+
+pub extern type Browser;
+pub extern type Page;
+
+// ── File-system extern (single read of axe.min.js at scanner construction) ────
+
+pub effect Fs {
+  fn read_file_sync(path: ref String) -> String;
+  fn require_resolve(spec: ref String) -> String;
+}
+
+// ── Browser-automation effect (engine-agnostic) ───────────────────────────────
+//
+// The two-engine TS impl chose puppeteer or playwright at runtime. In the
+// AffineScript decomposition the effect surface is engine-neutral; engine
+// selection lives behind a single `launch` op.
+
+pub effect Browser {
+  fn launch(args: ref List[String]) -> own Browser;
+  fn new_page(browser: mut Browser) -> own Page;
+  fn goto(page: mut Page, url: ref String) -> ();
+  fn evaluate_with_source[T](page: mut Page, script: ref String) -> T;
+  fn screenshot(page: mut Page) -> String;  // base64-encoded PNG
+  fn close(browser: own Browser) -> ();
+}
+
+// ── Time / clock (for scan duration measurement) ──────────────────────────────
+
+pub effect Clock {
+  fn now_ms() -> Int;
+}

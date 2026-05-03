@@ -1,0 +1,69 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Externs — compatibility shim for @accessibility-everywhere/core.
+// TODO: migrate to .affex once that filesystem is specified.
+
+module Externs;
+
+// ── ArangoDB opaque types ─────────────────────────────────────────────────────
+
+pub extern type Database;
+pub extern type Collection;
+pub extern type EdgeCollection;
+pub extern type Cursor;
+
+pub type CollectionInfo = {
+  name: String,
+}
+
+pub type IndexSpec = {
+  index_type: String,         // "persistent" | "hash" | …
+  fields: List[String],
+  unique: Bool,
+  sparse: Bool,
+}
+
+pub type DatabaseInit = {
+  url: String,
+  database_name: String,
+  username: String,
+  password: String,
+}
+
+// ── Db effect ─────────────────────────────────────────────────────────────────
+//
+// The single `Db` effect covers Database creation + collection lifecycle +
+// AQL queries + per-collection mutations + cursor materialisation.
+
+pub effect Db {
+  // Database lifecycle
+  fn open_database(init: ref DatabaseInit) -> own Database;
+  fn database_name(db: ref Database) -> String;
+  fn list_databases(db: ref Database) -> List[String];
+  fn create_database(db: mut Database, name: ref String) -> ();
+  fn list_collections(db: ref Database) -> List[CollectionInfo];
+  fn create_collection(db: mut Database, name: ref String) -> own Collection;
+  fn create_edge_collection(db: mut Database, name: ref String) -> own EdgeCollection;
+  fn collection(db: ref Database, name: ref String) -> Collection;
+
+  // AQL queries — bind-vars form (the playbook decomposition for the
+  // tagged-template `aql` form in the source TS)
+  fn query[B](db: ref Database, query: ref String, bind_vars: B) -> own Cursor;
+
+  // Per-collection ops
+  fn ensure_index(coll: mut Collection, spec: ref IndexSpec) -> ();
+  fn save[D, S](coll: mut Collection, doc: D) -> S;
+  fn update[D](coll: mut Collection, key: ref String, doc: D) -> ();
+  fn document[D](coll: ref Collection, key: ref String) -> D;
+  fn by_example[E](coll: ref Collection, example: E) -> own Cursor;
+  fn count(coll: ref Collection) -> Int;
+
+  // Cursor materialisation
+  fn cursor_all[T](cursor: own Cursor) -> List[T];
+  fn cursor_count(cursor: ref Cursor) -> Option[Int];
+}
+
+// ── Process / env extern (for createArangoDBService defaults) ─────────────────
+
+pub effect Process {
+  fn env(name: ref String) -> Option[String];
+}

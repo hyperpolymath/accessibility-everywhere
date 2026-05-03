@@ -1,0 +1,267 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+//
+// Server — Express bootstrap + 6 mounted routes.
+//
+// Re-decomposed from src/server.ts + 6 src/routes/*.ts per the playbook.
+//
+// Decomposition highlights:
+//   * Top-level `db` and `scanner` module-level singletons → owned record
+//     constructed once in `boot()` and threaded through route handlers as a
+//     `ref AppState`. Removes the implicit-singleton service-locator pattern
+//     the playbook flags (Source-Pattern Index → "Module-level getter for a
+//     singleton runtime").
+//   * `try/catch` around each handler → effect rows (Net + Db + Joi …) make
+//     each handler's surface visible; failures flow through Net.use_error_handler.
+//   * Joi schemas declared once at module top → unchanged shape; just typed.
+//   * `res.json({error: {…, status}})` → `respond_error(res, code, msg)` helper.
+
+module Server;
+
+use Externs;
+
+// ── Cross-package view of the core service ────────────────────────────────────
+//
+// We re-declare the slice of @accessibility-everywhere/core's Service that
+// we actually use (collections + the query fns). Once `.affex` cross-package
+// types resolve, this becomes `use Core` and the local re-decl drops.
+//
+// For the design-lock-in pass these are *opaque* — the Db effect carries the
+// methods we need; the Service record is just an owned tuple of collection
+// handles.
+
+pub extern type Service;       // re-declared opaque from core
+
+pub effect Db {
+  // Re-declared from core's Db effect. Once .affex cross-package types land,
+  // this disappears in favour of `use Core`.
+  fn get_site_by_url(svc: ref Service, url: ref String) -> Option[Site];
+  fn get_recent_scans(svc: ref Service, key: ref String, limit: Int) -> List[Scan];
+  fn get_violations_for_scan(svc: ref Service, key: ref String) -> List[Violation];
+  fn get_top_sites(svc: ref Service, limit: Int) -> List[Site];
+  fn get_common_violations(svc: ref Service, limit: Int) -> List[CriterionCount];
+  fn get_organization_sites(svc: ref Service, key: ref String) -> List[Site];
+  fn collection_save[D](svc: ref Service, coll_name: ref String, doc: D) -> SavedDoc;
+  fn collection_update[D](svc: ref Service, coll_name: ref String, key: ref String, doc: D) -> ();
+  fn collection_count(svc: ref Service, coll_name: ref String) -> Int;
+}
+
+pub effect Scanner {
+  fn scan(opts: ref ScanOptions) -> ScanResult;
+}
+
+// ── Locally re-declared core/scanner types (slim shims) ───────────────────────
+
+pub type SavedDoc       = { key: String }
+pub type WcagLevel      = A | AA | AAA
+pub type Impact         = Critical | Serious | Moderate | Minor
+pub type Site           = { key: String, url: String, domain: String, current_score: Int, last_scanned: String, scan_count: Int, previous_score: Option[Int] }
+pub type Scan           = { key: String, score: Int }
+pub type Violation      = { key: String }
+pub type CriterionCount = { criterion: String, count: Int }
+
+pub type ScanOptions = {
+  url: String,
+  wcag_level: WcagLevel,
+  screenshot: Bool,
+}
+
+pub type ScanResult = {
+  score: Int,
+  duration: Int,
+  timestamp: String,
+  violations: List[ViolationSlim],
+  passes: List[{}],
+  incomplete: List[{}],
+  metadata: { user_agent: String },
+}
+
+pub type ViolationSlim = {
+  impact: String,
+  description: String,
+  help_url: String,
+  wcag: List[String],
+  nodes: List[{ html: String, target: List[String] }],
+}
+
+// ── App-wide state (replaces the module-level `db` / `scanner` singletons) ────
+
+pub type AppState = {
+  db: Service,
+  scanner_handle: (),     // placeholder — real Scanner is opaque from core
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+pub fn respond_error(res: mut Externs.Res, status: Int, msg: ref String) -{Externs.Net}-> () {
+  Externs.res_status(res, status);
+  Externs.res_json(res, { error: { message: msg, status: status } })
+}
+
+pub fn parse_wcag_level(s: ref String) -> WcagLevel {
+  match s {
+    "A"   => A
+    "AAA" => AAA
+    _     => AA
+  }
+}
+
+// ── Route handlers ────────────────────────────────────────────────────────────
+//
+// Each handler is a standalone fn with its effect row visible. The TS routes
+// silently performed Db reads/writes inside try/catch — here those effects
+// are explicit at the signature. (Bodies remain TODO until the Node-target
+// lands; the fn contract is the design lock-in.)
+
+pub fn handle_post_scan(
+  state: ref AppState,
+  req: ref Externs.Req,
+  res: mut Externs.Res
+) -{Externs.Net + Externs.Joi + Db + Scanner + Externs.Clock}-> () {
+  // TODO: validate body against scanSchema; on error → respond_error(400);
+  //       on ok → Scanner.scan; Db get_site_by_url + collection_save/update;
+  //       Db.collection_save scan; iterate violations + nodes saving each;
+  //       Net.res_json with the success envelope.
+  let _ = state; let _ = req; let _ = res;
+  ()
+}
+
+pub fn handle_get_scan_by_id(
+  state: ref AppState,
+  req: ref Externs.Req,
+  res: mut Externs.Res
+) -{Externs.Net + Db}-> () {
+  // TODO: lookup scan via Db.collection_document; 404 if missing.
+  let _ = state; let _ = req; let _ = res;
+  ()
+}
+
+pub fn handle_post_violation(
+  state: ref AppState,
+  req: ref Externs.Req,
+  res: mut Externs.Res
+) -{Externs.Net + Db + Externs.Clock}-> () {
+  // TODO: get-or-create site; persist violation with timestamp.
+  let _ = state; let _ = req; let _ = res;
+  ()
+}
+
+pub fn handle_get_common_violations(
+  state: ref AppState,
+  req: ref Externs.Req,
+  res: mut Externs.Res
+) -{Externs.Net + Db}-> () {
+  let _ = state; let _ = req; let _ = res;
+  ()
+}
+
+pub fn handle_get_violations_for_site(
+  state: ref AppState,
+  req: ref Externs.Req,
+  res: mut Externs.Res
+) -{Externs.Net + Db}-> () {
+  let _ = state; let _ = req; let _ = res;
+  ()
+}
+
+pub fn handle_patch_violation_fixed(
+  state: ref AppState,
+  req: ref Externs.Req,
+  res: mut Externs.Res
+) -{Externs.Net + Db}-> () {
+  let _ = state; let _ = req; let _ = res;
+  ()
+}
+
+pub fn handle_get_leaderboard(
+  state: ref AppState,
+  req: ref Externs.Req,
+  res: mut Externs.Res
+) -{Externs.Net + Db + Externs.Clock}-> () {
+  let _ = state; let _ = req; let _ = res;
+  ()
+}
+
+pub fn handle_get_leaderboard_category(
+  state: ref AppState,
+  req: ref Externs.Req,
+  res: mut Externs.Res
+) -{Externs.Net + Db}-> () {
+  let _ = state; let _ = req; let _ = res;
+  ()
+}
+
+pub fn handle_get_badge(
+  state: ref AppState,
+  req: ref Externs.Req,
+  res: mut Externs.Res
+) -{Externs.Net + Db}-> () {
+  // Renders SVG when ?format=svg, else JSON. SVG template stays as a
+  // multi-line string literal, same as TS.
+  let _ = state; let _ = req; let _ = res;
+  ()
+}
+
+pub fn handle_get_stats(
+  state: ref AppState,
+  req: ref Externs.Req,
+  res: mut Externs.Res
+) -{Externs.Net + Db + Externs.Clock}-> () {
+  let _ = state; let _ = req; let _ = res;
+  ()
+}
+
+pub fn handle_get_stats_for_site(
+  state: ref AppState,
+  req: ref Externs.Req,
+  res: mut Externs.Res
+) -{Externs.Net + Db}-> () {
+  let _ = state; let _ = req; let _ = res;
+  ()
+}
+
+pub fn handle_get_dashboard(
+  state: ref AppState,
+  req: ref Externs.Req,
+  res: mut Externs.Res
+) -{Externs.Net + Db}-> () {
+  let _ = state; let _ = req; let _ = res;
+  ()
+}
+
+// ── Bootstrap ─────────────────────────────────────────────────────────────────
+
+pub fn boot(
+  port: Int
+) -{Externs.Dotenv + Externs.Net + Externs.IO + Externs.Process + Db + Scanner + Externs.Clock}-> () {
+  Externs.config();
+
+  // TODO: construct AppState — Service from core's create_arango_db_service,
+  //       scanner from scanner's make_scanner. Pending cross-pkg resolution.
+
+  let app = Externs.make_app();
+  Externs.use_helmet(app);
+  Externs.use_cors(app);
+  Externs.use_compression(app);
+  Externs.use_json_parser(app, "10mb");
+  Externs.use_rate_limit(
+    app, "/v1/", 900000, 100,
+    "Too many requests from this IP, please try again later."
+  );
+
+  // Health + version routes. (Top-level handlers; non-router.)
+  // TODO: wire via Externs.get_app + handler closures over `state`.
+
+  // Mount routers — sequence matches src/server.ts mounting order.
+  // TODO: build six routers (one per route group), wire each handler above
+  //       to its path, then Externs.use_router(app, "/v1/scan", scan_router)
+  //       … etc for /v1/violations, /v1/leaderboard, /v1/badge, /v1/stats,
+  //       /v1/dashboard.
+
+  // Error + 404 handlers.
+  // TODO: Externs.use_error_handler(app, …); Externs.use_not_found_handler(app, …)
+
+  // initialize_database (await Db.initialize from core), then listen.
+  Externs.listen(app, port, fn() -{Externs.IO}-> () {
+    Externs.println("✓ Accessibility Everywhere API listening")
+  })
+}
