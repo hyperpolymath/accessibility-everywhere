@@ -24,7 +24,7 @@ import * as fs from 'fs';
 // ... [other imports]
 
 export class AccessibilityScanner {
-  private axeSource: string;
+          axeSource        ;
 
   constructor() {
     // BOOTSTRAP: Synchronously loads the minified axe-core kernel 
@@ -36,7 +36,7 @@ export class AccessibilityScanner {
    * SCAN: The primary entry point for single-URL auditing.
    * Dispatches to the engine-specific runner (Puppeteer/Playwright).
    */
-  async scan(options: ScanOptions): Promise<ScanResult> {
+  async scan(options             )                      {
     const startTime = Date.now();
     const engine = options.engine || 'puppeteer';
     // ... [Engine dispatch logic]
@@ -53,7 +53,7 @@ export class AccessibilityScanner {
    * 4. EXECUTE: Run `axe.run` with the requested WCAG tags.
    * 5. CAPTURE: Record metadata and optional base64 screenshots.
    */
-  private async scanWithPuppeteer(options: ScanOptions, startTime: number): Promise<ScanResult> {
+          async scanWithPuppeteer(options             , startTime        )                      {
     // ... [Implementation using page.evaluate]
   }
 
@@ -66,7 +66,7 @@ export class AccessibilityScanner {
    * - Moderate: 3 points penalty.
    * - Minor: 1 point penalty.
    */
-  private calculateScore(axeResults: any): number {
+          calculateScore(axeResults     )         {
     // ... [Heuristic calculation logic]
   }
 }

@@ -19,7 +19,7 @@ violationsRouter.post('/', async (req, res, next) => {
 
     // Get or create site
     let site = await db.getSiteByUrl(url);
-    let siteKey: string;
+    let siteKey        ;
 
     if (!site) {
       const urlObj = new URL(url);
@@ -31,7 +31,7 @@ violationsRouter.post('/', async (req, res, next) => {
         scanCount: 0,
         currentScore: 0,
         status: 'active',
-      } as any);
+      }       );
       siteKey = siteDoc._key;
     } else {
       siteKey = site._key;
@@ -50,7 +50,7 @@ violationsRouter.post('/', async (req, res, next) => {
       html: violation.html || '',
       timestamp: new Date(timestamp || Date.now()),
       fixed: false,
-    } as any);
+    }       );
 
     res.json({
       success: true,
@@ -64,7 +64,7 @@ violationsRouter.post('/', async (req, res, next) => {
 // GET /v1/violations/common - Get most common violations
 violationsRouter.get('/common', async (req, res, next) => {
   try {
-    const limit = parseInt(req.query.limit as string) || 10;
+    const limit = parseInt(req.query.limit          ) || 10;
     const violations = await db.getCommonViolations(limit);
 
     res.json({

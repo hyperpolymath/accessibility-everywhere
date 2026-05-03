@@ -47,7 +47,7 @@ badgeRouter.get('/:domain', async (req, res, next) => {
   }
 });
 
-function getGrade(score: number): string {
+function getGrade(score        )         {
   if (score >= 90) return 'A';
   if (score >= 80) return 'B';
   if (score >= 70) return 'C';
@@ -55,7 +55,7 @@ function getGrade(score: number): string {
   return 'F';
 }
 
-function generateBadgeSVG(score: number): string {
+function generateBadgeSVG(score        )         {
   const grade = getGrade(score);
   const color = {
     A: '#28a745',

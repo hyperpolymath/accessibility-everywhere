@@ -14,7 +14,7 @@ import {
 // Security validator for testing
 class SecurityValidator {
   // SSRF prevention: block local and private IP addresses
-  isPrivateOrLocalIP(url: string): boolean {
+  isPrivateOrLocalIP(url        )          {
     try {
       const urlObj = new URL(url);
       const hostname = urlObj.hostname.toLowerCase();
@@ -69,7 +69,7 @@ class SecurityValidator {
     }
   }
 
-  validateUrlInput(url: string): { valid: boolean; error?: string } {
+  validateUrlInput(url        )                                     {
     // Check for SSRF
     if (this.isPrivateOrLocalIP(url)) {
       return {
@@ -98,7 +98,7 @@ class SecurityValidator {
     }
   }
 
-  sanitizeInput(input: string): string {
+  sanitizeInput(input        )         {
     // Remove null bytes
     let sanitized = input.replace(/\0/g, "");
 
@@ -111,7 +111,7 @@ class SecurityValidator {
     return sanitized;
   }
 
-  isMalformedUrl(url: string): boolean {
+  isMalformedUrl(url        )          {
     try {
       new URL(url);
       return false;
@@ -120,7 +120,7 @@ class SecurityValidator {
     }
   }
 
-  isXSSPayload(input: string): boolean {
+  isXSSPayload(input        )          {
     // Check for common XSS patterns
     const xssPatterns = [
       /javascript:/i,

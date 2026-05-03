@@ -13,24 +13,24 @@ import {
 
 // Mock scanner for property testing
 class PropertyScanner {
-  private resultCache: Map<string, unknown> = new Map();
+          resultCache                       = new Map();
 
-  async scan(options: {
-    url: string;
-    wcagLevel: string;
-    screenshot?: boolean;
-  }): Promise<{
-    score: number;
-    violations: Array<{ impact: string; [key: string]: unknown }>;
-    passes: unknown[];
-    incomplete: unknown[];
-    timestamp: string;
-  }> {
+  async scan(options   
+                
+                      
+                         
+   )           
+                  
+                                                                  
+                      
+                          
+                      
+     {
     // Generate deterministic result based on URL
     const cacheKey = `${options.url}:${options.wcagLevel}`;
 
     if (this.resultCache.has(cacheKey)) {
-      return this.resultCache.get(cacheKey) as never;
+      return this.resultCache.get(cacheKey)         ;
     }
 
     // Generate result
@@ -55,7 +55,7 @@ class PropertyScanner {
     return result;
   }
 
-  private generateDeterministicScore(url: string): number {
+          generateDeterministicScore(url        )         {
     // Hash URL to deterministic score 0-100
     let hash = 0;
     for (let i = 0; i < url.length; i++) {
@@ -65,7 +65,7 @@ class PropertyScanner {
     return Math.abs(hash % 101);
   }
 
-  private generateViolationCount(url: string): number {
+          generateViolationCount(url        )         {
     // Hash URL to 0-5 violations
     let hash = 0;
     for (let i = 0; i < url.length; i++) {
@@ -75,7 +75,7 @@ class PropertyScanner {
     return Math.abs(hash % 6);
   }
 
-  private getImpactForIndex(index: number, wcagLevel: string): string {
+          getImpactForIndex(index        , wcagLevel        )         {
     const impacts = ["critical", "serious", "moderate", "minor"];
     return impacts[index % impacts.length];
   }

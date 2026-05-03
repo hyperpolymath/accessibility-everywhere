@@ -7,13 +7,13 @@
 
 // Mock API implementations for benchmarking
 class BenchmarkScanner {
-  async scan(options: { url: string; wcagLevel: string }): Promise<{
-    score: number;
-    violations: unknown[];
-    passes: unknown[];
-    incomplete: unknown[];
-    timestamp: string;
-  }> {
+  async scan(options                                    )           
+                  
+                          
+                      
+                          
+                      
+     {
     // Simulate scan latency
     await this.delay(50);
 
@@ -32,13 +32,13 @@ class BenchmarkScanner {
     };
   }
 
-  private delay(ms: number): Promise<void> {
+          delay(ms        )                {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 
 class BenchmarkBadgeGenerator {
-  generateSVG(score: number): string {
+  generateSVG(score        )         {
     const grade = score >= 90 ? "A" : score >= 80 ? "B" : "C";
     const color = this.getGradeColor(grade);
 
@@ -51,8 +51,8 @@ class BenchmarkBadgeGenerator {
     `.trim();
   }
 
-  private getGradeColor(grade: string): string {
-    const colors: Record<string, string> = {
+          getGradeColor(grade        )         {
+    const colors                         = {
       A: "#28a745",
       B: "#8bc34a",
       C: "#ffc107",
@@ -64,11 +64,11 @@ class BenchmarkBadgeGenerator {
 }
 
 class BenchmarkStats {
-  aggregateStats(sites: unknown[], scans: unknown[]): {
-    totalSites: number;
-    totalScans: number;
-    averageScore: number;
-  } {
+  aggregateStats(sites           , scans           )   
+                       
+                       
+                         
+    {
     const siteCount = Array.isArray(sites) ? sites.length : 0;
     const scanCount = Array.isArray(scans) ? scans.length : 0;
     const averageScore = scanCount > 0 ? 82.5 : 0;
@@ -248,7 +248,7 @@ Deno.test("Benchmark - Violation report generation", { ignore: false }, () => {
         score: 85,
         timestamp: new Date().toISOString(),
         summary: {
-          critical: violations.filter((v: unknown) => true).length,
+          critical: violations.filter((v         ) => true).length,
         },
       };
     }

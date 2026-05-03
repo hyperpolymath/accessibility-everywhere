@@ -2,11 +2,9 @@
   "name": "@accessibility-everywhere/scanner",
   "version": "1.0.0",
   "description": "Accessibility scanner using axe-core for WCAG compliance checking",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "src/index.js",
+  "type": "module",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
     "test": "jest"
   },
   "dependencies": {
@@ -16,9 +14,6 @@
     "puppeteer": "^24.31.0"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.8",
-    "@types/node": "^20.10.0",
-    "jest": "^29.7.0",
-    "typescript": "^5.3.2"
+    "jest": "^29.7.0"
   }
 }

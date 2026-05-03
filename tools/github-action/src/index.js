@@ -6,7 +6,7 @@ async function run() {
   try {
     // Get inputs
     const url = core.getInput('url', { required: true });
-    const wcagLevel = core.getInput('wcag-level') as 'A' | 'AA' | 'AAA';
+    const wcagLevel = core.getInput('wcag-level')                      ;
     const failOnViolations = core.getInput('fail-on-violations') === 'true';
     const minScore = parseInt(core.getInput('min-score') || '0');
     const commentPR = core.getInput('comment-pr') === 'true';
@@ -67,12 +67,12 @@ async function run() {
     if (result.violations.length === 0 && result.score >= minScore) {
       core.info('✓ Accessibility check passed!');
     }
-  } catch (error: any) {
+  } catch (error     ) {
     core.setFailed(`Action failed: ${error.message}`);
   }
 }
 
-function generateSummary(result: any, url: string, wcagLevel: string): string {
+function generateSummary(result     , url        , wcagLevel        )         {
   const grade = getGrade(result.score);
   const gradeEmoji = {
     A: '🟢',
@@ -96,8 +96,8 @@ function generateSummary(result: any, url: string, wcagLevel: string): string {
 
   if (result.violations.length > 0) {
     markdown += `## Violations\n\n`;
-    result.violations.slice(0, 10).forEach((v: any, i: number) => {
-      const impact = v.impact as 'critical' | 'serious' | 'moderate' | 'minor';
+    result.violations.slice(0, 10).forEach((v     , i        ) => {
+      const impact = v.impact                                                 ;
       const impactEmoji = {
         critical: '🔴',
         serious: '🟠',
@@ -123,7 +123,7 @@ function generateSummary(result: any, url: string, wcagLevel: string): string {
   return markdown;
 }
 
-async function postPRComment(token: string, result: any, url: string, wcagLevel: string) {
+async function postPRComment(token        , result     , url        , wcagLevel        ) {
   const octokit = github.getOctokit(token);
   const { context } = github;
 
@@ -140,7 +140,7 @@ async function postPRComment(token: string, result: any, url: string, wcagLevel:
   });
 }
 
-function getGrade(score: number): string {
+function getGrade(score        )         {
   if (score >= 90) return 'A';
   if (score >= 80) return 'B';
   if (score >= 70) return 'C';

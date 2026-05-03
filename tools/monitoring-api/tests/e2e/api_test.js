@@ -13,46 +13,46 @@ import {
 } from "https://deno.land/std@0.208.0/assert/mod.ts";
 
 // Mock types for testing
-interface MockScanResult {
-  score: number;
-  violations: Array<{
-    impact: string;
-    description: string;
-    nodes: unknown[];
-    wcag: string[];
-    helpUrl: string;
-  }>;
-  passes: unknown[];
-  incomplete: unknown[];
-  timestamp: string;
-  duration: number;
-  metadata: {
-    userAgent: string;
-  };
-}
+                          
+                
+                     
+                   
+                        
+                     
+                   
+                    
+     
+                    
+                        
+                    
+                   
+             
+                      
+    
+ 
 
-interface MockSite {
-  _key: string;
-  url: string;
-  domain: string;
-  currentScore: number;
-  lastScanned: string;
-}
+                    
+               
+              
+                 
+                       
+                      
+ 
 
-interface MockViolation {
-  wcagCriterion: string;
-  impact: string;
-  description: string;
-  instances: number;
-}
+                         
+                        
+                 
+                      
+                    
+ 
 
 // Mock scanner for testing
 class MockScanner {
-  async scan(options: {
-    url: string;
-    wcagLevel: string;
-    screenshot?: boolean;
-  }): Promise<MockScanResult> {
+  async scan(options   
+                
+                      
+                         
+   )                          {
     // Validate URL format
     try {
       new URL(options.url);
@@ -85,50 +85,50 @@ class MockScanner {
 
 // Mock database for testing
 class MockDatabase {
-  private sitesMap: Map<string, MockSite> = new Map();
-  private violationsMap: Map<string, MockViolation> = new Map();
-  private scansMap: Map<string, unknown> = new Map();
-  private siteCounter = 0;
-  private violationCounter = 0;
-  private scanCounter = 0;
+          sitesMap                        = new Map();
+          violationsMap                             = new Map();
+          scansMap                       = new Map();
+          siteCounter = 0;
+          violationCounter = 0;
+          scanCounter = 0;
 
-  async getSiteByUrl(url: string): Promise<MockSite | null> {
+  async getSiteByUrl(url        )                           {
     for (const site of this.sitesMap.values()) {
       if (site.url === url) return site;
     }
     return null;
   }
 
-  async getCommonViolations(limit: number): Promise<MockViolation[]> {
+  async getCommonViolations(limit        )                           {
     return Array.from(this.violationsMap.values()).slice(0, limit);
   }
 
-  async getRecentScansForSite(siteKey: string, days: number): Promise<unknown[]> {
+  async getRecentScansForSite(siteKey        , days        )                     {
     return Array.from(this.scansMap.values()).slice(-5);
   }
 
-  async getSiteViolationTrend(siteKey: string, days: number): Promise<number[]> {
+  async getSiteViolationTrend(siteKey        , days        )                    {
     return [85, 84, 83, 84, 85]; // Mock trend data
   }
 
   // Mock collections
   sites = {
-    save: async (data: unknown) => {
+    save: async (data         ) => {
       const key = `site-${++this.siteCounter}`;
-      const siteData = data as unknown as Partial<MockSite>;
-      this.sitesMap.set(key, { _key: key, ...siteData } as MockSite);
+      const siteData = data                                ;
+      this.sitesMap.set(key, { _key: key, ...siteData }            );
       return { _key: key };
     },
-    update: async (key: string, data: unknown) => {
+    update: async (key        , data         ) => {
       const site = this.sitesMap.get(key);
       if (site) {
         Object.assign(site, data);
       }
     },
-    document: async (key: string) => this.sitesMap.get(key),
+    document: async (key        ) => this.sitesMap.get(key),
     count: async () => ({ count: this.sitesMap.size }),
-    byExample: (_query: unknown) => ({
-      then: (cb: (cursor: unknown) => unknown) =>
+    byExample: (_query         ) => ({
+      then: (cb                              ) =>
         cb({
           all: () => Array.from(this.sitesMap.values()),
         }),
@@ -136,29 +136,29 @@ class MockDatabase {
   };
 
   scans = {
-    save: async (data: unknown) => {
+    save: async (data         ) => {
       const key = `scan-${++this.scanCounter}`;
       this.scansMap.set(key, data);
       return { _key: key };
     },
-    document: async (key: string) => this.scansMap.get(key),
+    document: async (key        ) => this.scansMap.get(key),
     count: async () => ({ count: this.scansMap.size }),
   };
 
   violations = {
-    save: async (data: unknown) => {
+    save: async (data         ) => {
       const key = `violation-${++this.violationCounter}`;
-      this.violationsMap.set(key, data as MockViolation);
+      this.violationsMap.set(key, data                 );
       return { _key: key };
     },
-    update: async (key: string, data: unknown) => {
+    update: async (key        , data         ) => {
       const violation = this.violationsMap.get(key);
       if (violation) {
         Object.assign(violation, data);
       }
     },
-    byExample: (_query: unknown) => ({
-      then: (cb: (cursor: unknown) => unknown) =>
+    byExample: (_query         ) => ({
+      then: (cb                              ) =>
         cb({
           all: () => Array.from(this.violationsMap.values()),
         }),

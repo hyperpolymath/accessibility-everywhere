@@ -11,51 +11,51 @@ import {
 } from "https://deno.land/std@0.208.0/assert/mod.ts";
 
 // Mock GitHub Action input/output
-interface ActionInput {
-  url?: string;
-  "wcag-level"?: string;
-  "fail-on-violations"?: string;
-  "min-score"?: string;
-  "comment-pr"?: string;
-  "github-token"?: string;
-}
+                       
+               
+                        
+                                
+                       
+                        
+                          
+ 
 
-interface ActionOutput {
-  score?: number;
-  violations?: number;
-  passes?: number;
-  "report-url"?: string;
-}
+                        
+                 
+                      
+                  
+                        
+ 
 
 class MockGitHubAction {
-  private inputs: ActionInput = {};
-  private outputs: ActionOutput = {};
+          inputs              = {};
+          outputs               = {};
 
-  setInput(name: string, value: string): void {
-    this.inputs[name as keyof ActionInput] = value;
+  setInput(name        , value        )       {
+    this.inputs[name                     ] = value;
   }
 
-  getInput(name: string, required = false): string | undefined {
-    const value = this.inputs[name as keyof ActionInput];
+  getInput(name        , required = false)                     {
+    const value = this.inputs[name                     ];
     if (required && !value) {
       throw new Error(`Input required and not supplied: ${name}`);
     }
     return value;
   }
 
-  setOutput(name: string, value: unknown): void {
-    this.outputs[name as keyof ActionOutput] = value as never;
+  setOutput(name        , value         )       {
+    this.outputs[name                      ] = value         ;
   }
 
-  getOutputs(): ActionOutput {
+  getOutputs()               {
     return this.outputs;
   }
 
-  validateInputs(): {
-    valid: boolean;
-    errors: string[];
-  } {
-    const errors: string[] = [];
+  validateInputs()   
+                   
+                     
+    {
+    const errors           = [];
 
     // Check required input: url
     if (!this.getInput("url")) {
@@ -93,11 +93,11 @@ class MockGitHubAction {
     };
   }
 
-  generateSummary(result: {
-    score: number;
-    violations: unknown[];
-    passes: unknown[];
-  }): string {
+  generateSummary(result   
+                  
+                          
+                      
+   )         {
     const grade =
       result.score >= 90
         ? "A"
