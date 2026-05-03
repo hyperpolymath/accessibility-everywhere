@@ -15,24 +15,13 @@
 //   * `iconBefore?: ReactNode`         → `Option[own Element]`; caller pre-builds the icon
 //   * Exception path on missing args   → defaulted via `default_button_props`
 //
-// Effect annotation: every DOM mutation is `IO` here. Once @affinescript/dom
-// publishes a typed `DOM` effect, swap the `/ IO` rows below to `/ DOM`.
+// Conventions: see feedback_affinescript_conventions.md — face = canonical,
+// effect annotation = `-{Effects}->`, DOM mutations live under the `DOM`
+// effect (declared in Externs.affine).
 
-// ── DOM FFI (inline; replace with `import @affinescript/dom` once that package
-// ── has a stable surface and a real cross-package import story in this repo)
+module Button;
 
-extern type Element;
-extern type Event;
-
-extern fn createElement(tag: ref String) -> own Element / IO;
-extern fn createTextNode(text: ref String) -> own Element / IO;
-extern fn setAttribute(el: mut Element, name: ref String, value: ref String) -> () / IO;
-extern fn appendChild(parent: mut Element, child: own Element) -> () / IO;
-extern fn addEventListener(
-  el: mut Element,
-  event: ref String,
-  handler: fn(Event) -> () / IO
-) -> () / IO;
+use Externs;
 
 // ── Domain types ──────────────────────────────────────────────────────────────
 
@@ -50,13 +39,13 @@ type ButtonProps = own {
   class_extra: String,            // appended to the computed class list
   button_type: String,            // "button" | "submit" | "reset"
   aria_label: Option[String],
-  on_click: Option[fn(Event) -> () / IO],
-  text: own Element,              // pre-built label (text node or richer subtree)
-  icon_before: Option[own Element],
-  icon_after: Option[own Element],
+  on_click: Option[fn(Externs.Event) -{Externs.DOM}-> ()],
+  text: own Externs.Element,      // pre-built label (text node or richer subtree)
+  icon_before: Option[own Externs.Element],
+  icon_after: Option[own Externs.Element],
 }
 
-fn default_button_props(text: own Element) -> own ButtonProps {
+pub fn default_button_props(text: own Externs.Element) -> own ButtonProps {
   ButtonProps {
     variant: Primary,
     size: Md,
@@ -72,7 +61,7 @@ fn default_button_props(text: own Element) -> own ButtonProps {
   }
 }
 
-// ── Class-name helpers (pure) ─────────────────────────────────────────────────
+// ── Class-name helpers (pure, no effect row) ──────────────────────────────────
 
 fn variant_class(v: ref ButtonVariant) -> String {
   match v {
@@ -96,7 +85,7 @@ fn loading_class(loading: Bool) -> String {
 }
 
 // Joins non-empty parts with single spaces.
-// (Stdlib presumably has String.join; this is a sketch using concat operators.)
+// (Stdlib presumably has String.join; this is a sketch using `++` per Q1.)
 fn join_classes(
   base: ref String,
   v: ref String,
@@ -104,20 +93,21 @@ fn join_classes(
   l: ref String,
   extra: ref String
 ) -> String {
-  let with_v  = if v == ""     { base   } else { base   ++ " " ++ v };
-  let with_s  = if s == ""     { with_v } else { with_v ++ " " ++ s };
-  let with_l  = if l == ""     { with_s } else { with_s ++ " " ++ l };
-  let with_e  = if extra == "" { with_l } else { with_l ++ " " ++ extra };
+  let with_v = if v == ""     { base   } else { base   ++ " " ++ v };
+  let with_s = if s == ""     { with_v } else { with_v ++ " " ++ s };
+  let with_l = if l == ""     { with_s } else { with_s ++ " " ++ l };
+  let with_e = if extra == "" { with_l } else { with_l ++ " " ++ extra };
   with_e
 }
 
 // ── The builder ───────────────────────────────────────────────────────────────
 //
 // Returns an owned button element. The caller is responsible for mounting it
-// (via @affinescript/dom's `mount`) and ultimately for letting it drop, which
-// the runtime will detach from the live DOM.
+// (via @affinescript/dom's `mount` once cross-package import lands) and
+// ultimately for letting it drop, which the runtime will detach from the
+// live DOM.
 
-fn make_button(props: own ButtonProps) -> own Element / IO {
+pub fn make_button(props: own ButtonProps) -{Externs.DOM}-> own Externs.Element {
   let busy: Bool = props.disabled || props.loading;
 
   let classes: String = join_classes(
@@ -128,26 +118,26 @@ fn make_button(props: own ButtonProps) -> own Element / IO {
     props.class_extra,
   );
 
-  let btn = createElement("button");
-  setAttribute(btn, "type", props.button_type);
-  setAttribute(btn, "class", classes);
+  let btn = Externs.create_element("button");
+  Externs.set_attribute(btn, "type", props.button_type);
+  Externs.set_attribute(btn, "class", classes);
 
   if busy {
-    setAttribute(btn, "disabled", "");
-    setAttribute(btn, "aria-disabled", "true");
+    Externs.set_attribute(btn, "disabled", "");
+    Externs.set_attribute(btn, "aria-disabled", "true");
   }
 
   if props.loading {
-    setAttribute(btn, "aria-busy", "true");
+    Externs.set_attribute(btn, "aria-busy", "true");
   }
 
   match props.aria_label {
-    Some(label) => setAttribute(btn, "aria-label", label)
+    Some(label) => Externs.set_attribute(btn, "aria-label", label)
     None => ()
   }
 
   match props.on_click {
-    Some(handler) => addEventListener(btn, "click", handler)
+    Some(handler) => Externs.add_event_listener(btn, "click", handler)
     None => ()
   }
 
@@ -155,18 +145,18 @@ fn make_button(props: own ButtonProps) -> own Element / IO {
   //   loading: spinner only (icons + text suppressed)
   //   else:    [icon_before?] text [icon_after?]
   if props.loading {
-    let spinner = createElement("span");
-    setAttribute(spinner, "class", "a11y-button__spinner");
-    setAttribute(spinner, "aria-hidden", "true");
-    appendChild(btn, spinner);
+    let spinner = Externs.create_element("span");
+    Externs.set_attribute(spinner, "class", "a11y-button__spinner");
+    Externs.set_attribute(spinner, "aria-hidden", "true");
+    Externs.append_child(btn, spinner);
   } else {
     match props.icon_before {
       Some(icon) => {
-        let wrap = createElement("span");
-        setAttribute(wrap, "class", "a11y-button__icon-before");
-        setAttribute(wrap, "aria-hidden", "true");
-        appendChild(wrap, icon);
-        appendChild(btn, wrap);
+        let wrap = Externs.create_element("span");
+        Externs.set_attribute(wrap, "class", "a11y-button__icon-before");
+        Externs.set_attribute(wrap, "aria-hidden", "true");
+        Externs.append_child(wrap, icon);
+        Externs.append_child(btn, wrap);
       }
       None => ()
     }
@@ -174,19 +164,19 @@ fn make_button(props: own ButtonProps) -> own Element / IO {
 
   // Text wrapper is always present (loading just hides icons, not the label
   // — preserves layout stability per WCAG 2.1.4.13 advisory).
-  let text_wrap = createElement("span");
-  setAttribute(text_wrap, "class", "a11y-button__text");
-  appendChild(text_wrap, props.text);
-  appendChild(btn, text_wrap);
+  let text_wrap = Externs.create_element("span");
+  Externs.set_attribute(text_wrap, "class", "a11y-button__text");
+  Externs.append_child(text_wrap, props.text);
+  Externs.append_child(btn, text_wrap);
 
   if !props.loading {
     match props.icon_after {
       Some(icon) => {
-        let wrap = createElement("span");
-        setAttribute(wrap, "class", "a11y-button__icon-after");
-        setAttribute(wrap, "aria-hidden", "true");
-        appendChild(wrap, icon);
-        appendChild(btn, wrap);
+        let wrap = Externs.create_element("span");
+        Externs.set_attribute(wrap, "class", "a11y-button__icon-after");
+        Externs.set_attribute(wrap, "aria-hidden", "true");
+        Externs.append_child(wrap, icon);
+        Externs.append_child(btn, wrap);
       }
       None => ()
     }

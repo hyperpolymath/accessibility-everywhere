@@ -6,14 +6,29 @@
 // Modal stays as Modal.tsx in this revision — its focus-trap + portal + scroll-
 // lock + escape-handler bundle needs deeper effect-modelling (see PORTING_NOTES
 // at the bottom of this file), and is the next session's work.
+//
+// Conventions: see feedback_affinescript_conventions.md.
 
-// Re-export Button surface
-type ButtonVariant = Primary | Secondary | Ghost | Danger
-type ButtonSize    = Sm | Md | Lg
+module Index;
 
-// Library version + WCAG conformance level (these are pure data; effect-free).
-let version: String   = "1.0.0"
-let wcag_level: String = "AA"
+use Button;
+
+// Re-export the Button surface
+pub type ButtonVariant = Button.ButtonVariant
+pub type ButtonSize    = Button.ButtonSize
+pub type ButtonProps   = Button.ButtonProps
+
+pub fn make_button(props: own ButtonProps) -{Externs.DOM}-> own Externs.Element {
+  Button.make_button(props)
+}
+
+pub fn default_button_props(text: own Externs.Element) -> own ButtonProps {
+  Button.default_button_props(text)
+}
+
+// Library metadata (pure data; effect-free)
+pub let version: String     = "1.0.0"
+pub let wcag_level: String  = "AA"
 
 // ── PORTING_NOTES for Modal (next session) ────────────────────────────────────
 //
@@ -28,8 +43,8 @@ let wcag_level: String = "AA"
 //                                              drop restores `body.style.overflow`
 //   * `useEffect` previous-focus restoration → captured-once Element ref stored
 //                                              on the `own Modal` record
-//   * `useId`                                 → effect `Id { fn fresh() -> String }`
-//   * `useState(mounted)`                     → no equivalent; SSR-portal toggling
+//   * `useId`                                → effect `Id { fn fresh() -> String }`
+//   * `useState(mounted)`                    → no equivalent; SSR-portal toggling
 //                                              is irrelevant outside React
 //
 // In short: every "useEffect cleanup" becomes a Drop-on-own resource. The React
