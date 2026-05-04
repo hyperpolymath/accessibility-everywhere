@@ -1,0 +1,43 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+//
+// Externs — the package's compatibility shim.
+//
+// Per the AffineScript conventions resolution log Q4 (per-package shim,
+// pending the `.affex` compatibility filesystem), every package centralises
+// its `extern` declarations in this single file and re-exports them as
+// public AffineScript symbols. Other files in the package `use Externs` and
+// reference normal AffineScript names — the affine core stays legible, and
+// the future migration to `.affex` is a one-file edit per package.
+//
+// TODO: migrate this file's contents to `.affex` once that filesystem is
+//       specified. See feedback_affinescript_conventions.md parking lot.
+
+module Externs;
+
+// ── Browser DOM extern types ──────────────────────────────────────────────────
+//
+// `Element` and `Event` are opaque on the AffineScript side — the host JS
+// runtime owns their representation. Affine ownership tracks who is allowed
+// to mutate / append to an element; the extern fns below carry the
+// borrow-mode (own / mut / ref) appropriate to each operation.
+
+pub extern type Element;
+pub extern type Event;
+
+// ── Browser DOM effect ────────────────────────────────────────────────────────
+//
+// `DOM` is the named effect for any operation that creates or mutates live
+// DOM. Per Q3 of the conventions log, this is *not* `IO` — `IO` is reserved
+// for terminal IO (`println`/`eprintln`) per the existing warmup convention.
+
+pub effect DOM {
+  fn create_element(tag: ref String) -> own Element;
+  fn create_text_node(text: ref String) -> own Element;
+  fn set_attribute(el: mut Element, name: ref String, value: ref String) -> ();
+  fn append_child(parent: mut Element, child: own Element) -> ();
+  fn add_event_listener(
+    el: mut Element,
+    event: ref String,
+    handler: fn(Event) -{DOM}-> ()
+  ) -> ();
+}

@@ -87,7 +87,7 @@ app.use('/v1/stats', statsRouter);
 app.use('/v1/dashboard', dashboardRouter);
 
 // Error handling
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err     , req                 , res                  , next                      ) => {
   console.error('Error:', err);
   res.status(err.status || 500).json({
     error: {

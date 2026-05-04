@@ -6,7 +6,7 @@ export const leaderboardRouter = Router();
 // GET /v1/leaderboard - Get top sites by accessibility score
 leaderboardRouter.get('/', async (req, res, next) => {
   try {
-    const limit = parseInt(req.query.limit as string) || 100;
+    const limit = parseInt(req.query.limit          ) || 100;
     const sites = await db.getTopSites(limit);
 
     const leaderboard = sites.map((site, index) => ({
@@ -38,7 +38,7 @@ leaderboardRouter.get('/', async (req, res, next) => {
 leaderboardRouter.get('/category/:category', async (req, res, next) => {
   try {
     const { category } = req.params;
-    const limit = parseInt(req.query.limit as string) || 100;
+    const limit = parseInt(req.query.limit          ) || 100;
 
     // This would filter by category in production
     // For now, return top sites
