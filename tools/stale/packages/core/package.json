@@ -2,16 +2,19 @@
   "name": "@accessibility-everywhere/core",
   "version": "1.0.0",
   "description": "Core functionality for accessibility scanning and database operations",
-  "main": "src/index.js",
+  "main": "src/Index.mjs",
   "type": "module",
   "scripts": {
-    "test": "jest"
+    "build": "rescript build",
+    "dev": "rescript build -w",
+    "clean": "rescript clean"
   },
   "dependencies": {
     "arangojs": "^8.8.1",
     "dotenv": "^16.3.1"
   },
   "devDependencies": {
-    "jest": "^29.7.0"
+    "rescript": "^11.1.0",
+    "@rescript/core": "^1.5.0"
   }
 }

@@ -2,18 +2,21 @@
   "name": "@accessibility-everywhere/scanner",
   "version": "1.0.0",
   "description": "Accessibility scanner using axe-core for WCAG compliance checking",
-  "main": "src/index.js",
+  "main": "src/Index.mjs",
+  "module": "src/Index.mjs",
   "type": "module",
   "scripts": {
-    "test": "jest"
+    "build": "rescript build",
+    "dev": "rescript build -w",
+    "clean": "rescript clean"
   },
   "dependencies": {
-    "@accessibility-everywhere/core": "^1.0.0",
     "axe-core": "^4.8.2",
     "playwright": "^1.40.0",
     "puppeteer": "^24.31.0"
   },
   "devDependencies": {
-    "jest": "^29.7.0"
+    "rescript": "^11.1.0",
+    "@rescript/core": "^1.5.0"
   }
 }
