@@ -1,7 +1,0 @@
-{
-  "name": "accessibility-everywhere-res",
-  "sources": "src",
-  "package-specs": { "module": "es6", "in-source": true },
-  "suffix": ".mjs",
-  "bs-dependencies": ["@rescript/core"]
-}

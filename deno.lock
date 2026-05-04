@@ -52,53 +52,69 @@
       "tools/cli": {
         "packageJson": {
           "dependencies": [
-            "npm:@accessibility-everywhere/scanner@1",
-            "npm:@types/fs-extra@^11.0.4",
-            "npm:@types/node@^20.10.0",
-            "npm:chalk@^4.1.2",
+            "npm:@rescript/core@^1.5.0",
+            "npm:chalk@^5.3.0",
             "npm:cli-table3@~0.6.3",
             "npm:commander@^11.1.0",
             "npm:fs-extra@^11.2.0",
-            "npm:ora@^5.4.1",
-            "npm:ts-node@^10.9.2",
-            "npm:typescript@^5.3.2"
+            "npm:ora@^7.0.1",
+            "npm:rescript@^11.1.0"
           ]
         }
       },
       "tools/github-action": {
         "packageJson": {
           "dependencies": [
-            "npm:@accessibility-everywhere/scanner@1",
             "npm:@actions/core@^1.10.1",
             "npm:@actions/github@6",
-            "npm:@types/node@^20.10.0",
-            "npm:@vercel/ncc@~0.38.1",
-            "npm:typescript@^5.3.2"
+            "npm:@rescript/core@^1.5.0",
+            "npm:rescript@^11.1.0"
           ]
         }
       },
       "tools/monitoring-api": {
         "packageJson": {
           "dependencies": [
-            "npm:@accessibility-everywhere/core@1",
-            "npm:@accessibility-everywhere/scanner@1",
-            "npm:@types/compression@^1.7.5",
-            "npm:@types/cors@^2.8.17",
-            "npm:@types/express@^4.17.21",
-            "npm:@types/jest@^29.5.8",
-            "npm:@types/node@^20.10.0",
-            "npm:@types/uuid@^9.0.7",
+            "npm:@rescript/core@^1.5.0",
             "npm:compression@^1.7.4",
             "npm:cors@^2.8.5",
             "npm:dotenv@^16.3.1",
             "npm:express-rate-limit@^7.1.5",
             "npm:express@^4.18.2",
             "npm:helmet@^7.1.0",
-            "npm:jest@^29.7.0",
             "npm:joi@^17.11.0",
-            "npm:ts-node-dev@2",
-            "npm:typescript@^5.3.2",
-            "npm:uuid@^9.0.1"
+            "npm:rescript@^11.1.0",
+            "npm:uuid@14"
+          ]
+        }
+      },
+      "tools/stale/packages/core": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rescript/core@^1.5.0",
+            "npm:arangojs@^8.8.1",
+            "npm:dotenv@^16.3.1",
+            "npm:rescript@^11.1.0"
+          ]
+        }
+      },
+      "tools/stale/packages/scanner": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rescript/core@^1.5.0",
+            "npm:axe-core@^4.8.2",
+            "npm:playwright@^1.40.0",
+            "npm:puppeteer@^24.31.0",
+            "npm:rescript@^11.1.0"
+          ]
+        }
+      },
+      "tools/stale/packages/stale/components/react": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rescript/core@^1.5.0",
+            "npm:@rescript/react@0.13",
+            "npm:rescript@^11.1.0"
           ]
         }
       }
