@@ -1,91 +1,91 @@
 import { Database, aql } from 'arangojs';
 import { DocumentCollection, EdgeCollection } from 'arangojs/collection';
 
-export interface ArangoConfig {
-  url: string;
-  database: string;
-  username: string;
-  password: string;
-}
+                               
+              
+                   
+                   
+                   
+ 
 
-export interface Site {
-  _key: string;
-  url: string;
-  domain: string;
-  firstScanned: Date;
-  lastScanned: Date;
-  scanCount: number;
-  currentScore: number;
-  previousScore?: number;
-  status: 'active' | 'inactive' | 'failed';
-  metadata?: Record<string, any>;
-}
+                       
+               
+              
+                 
+                     
+                    
+                    
+                       
+                         
+                                           
+                                 
+ 
 
-export interface Scan {
-  _key: string;
-  siteKey: string;
-  timestamp: Date;
-  score: number;
-  violations: number;
-  passes: number;
-  incomplete: number;
-  url: string;
-  wcagLevel: 'A' | 'AA' | 'AAA';
-  duration: number;
-  userAgent?: string;
-}
+                       
+               
+                  
+                  
+                
+                     
+                 
+                     
+              
+                                
+                   
+                     
+ 
 
-export interface Violation {
-  _key: string;
-  scanKey: string;
-  siteKey: string;
-  wcagCriterion: string;
-  wcagLevel: 'A' | 'AA' | 'AAA';
-  impact: 'critical' | 'serious' | 'moderate' | 'minor';
-  description: string;
-  helpUrl: string;
-  selector: string;
-  html: string;
-  timestamp: Date;
-  fixed: boolean;
-}
+                            
+               
+                  
+                  
+                        
+                                
+                                                        
+                      
+                  
+                   
+               
+                  
+                 
+ 
 
-export interface WCAGCriterion {
-  _key: string;
-  criterion: string;
-  level: 'A' | 'AA' | 'AAA';
-  principle: 'perceivable' | 'operable' | 'understandable' | 'robust';
-  guideline: string;
-  title: string;
-  description: string;
-  successCriteria: string;
-  techniques: string[];
-  failures: string[];
-}
+                                
+               
+                    
+                            
+                                                                      
+                    
+                
+                      
+                          
+                       
+                     
+ 
 
-export interface Organization {
-  _key: string;
-  name: string;
-  domain: string;
-  contactEmail?: string;
-  tier: 'free' | 'pro' | 'enterprise';
-  createdAt: Date;
-  apiKey?: string;
-}
+                               
+               
+               
+                 
+                        
+                                      
+                  
+                  
+ 
 
 export class ArangoDBService {
-  private db: Database;
-  public sites!: DocumentCollection<Site>;
-  public scans!: DocumentCollection<Scan>;
-  public violations!: DocumentCollection<Violation>;
-  public wcagCriteria!: DocumentCollection<WCAGCriterion>;
-  public organizations!: DocumentCollection<Organization>;
-  public siteScans!: EdgeCollection;
-  public scanViolations!: EdgeCollection;
-  public violationCriteria!: EdgeCollection;
-  public orgSites!: EdgeCollection;
+          db          ;
+         sites                           ;
+         scans                           ;
+         violations                                ;
+         wcagCriteria                                    ;
+         organizations                                   ;
+         siteScans                 ;
+         scanViolations                 ;
+         violationCriteria                 ;
+         orgSites                 ;
 
-  constructor(config: ArangoConfig) {
+  constructor(config              ) {
     this.db = new Database({
       url: config.url,
       databaseName: config.database,
@@ -96,7 +96,7 @@ export class ArangoDBService {
     });
   }
 
-  async initialize(): Promise<void> {
+  async initialize()                {
     // Create database if it doesn't exist
     const databases = await this.db.listDatabases();
     if (!databases.includes(this.db.name)) {
@@ -134,21 +134,21 @@ export class ArangoDBService {
     await this.initializeWCAGCriteria();
   }
 
-  private async createCollectionIfNotExists(name: string): Promise<void> {
+          async createCollectionIfNotExists(name        )                {
     const collections = await this.db.listCollections();
     if (!collections.some(c => c.name === name)) {
       await this.db.createCollection(name);
     }
   }
 
-  private async createEdgeCollectionIfNotExists(name: string): Promise<void> {
+          async createEdgeCollectionIfNotExists(name        )                {
     const collections = await this.db.listCollections();
     if (!collections.some(c => c.name === name)) {
       await this.db.createEdgeCollection(name);
     }
   }
 
-  private async createIndexes(): Promise<void> {
+          async createIndexes()                {
     // Sites indexes
     await this.sites.ensureIndex({ type: 'persistent', fields: ['url'], unique: true });
     await this.sites.ensureIndex({ type: 'persistent', fields: ['domain'] });
@@ -175,7 +175,7 @@ export class ArangoDBService {
     await this.organizations.ensureIndex({ type: 'persistent', fields: ['apiKey'], unique: true, sparse: true });
   }
 
-  private async initializeWCAGCriteria(): Promise<void> {
+          async initializeWCAGCriteria()                {
     const count = await this.wcagCriteria.count();
     if (count.count === 0) {
       // Insert WCAG 2.1 Level AA criteria
@@ -186,7 +186,7 @@ export class ArangoDBService {
     }
   }
 
-  private getWCAGCriteriaData(): WCAGCriterion[] {
+          getWCAGCriteriaData()                  {
     return [
       {
         _key: '1_1_1',
@@ -312,7 +312,7 @@ export class ArangoDBService {
   }
 
   // Query methods
-  async getSiteByUrl(url: string): Promise<Site | null> {
+  async getSiteByUrl(url        )                       {
     const cursor = await this.db.query(aql`
       FOR site IN sites
       FILTER site.url == ${url}
@@ -323,7 +323,7 @@ export class ArangoDBService {
     return results.length > 0 ? results[0] : null;
   }
 
-  async getRecentScansForSite(siteKey: string, limit: number = 10): Promise<Scan[]> {
+  async getRecentScansForSite(siteKey        , limit         = 10)                  {
     const cursor = await this.db.query(aql`
       FOR scan IN scans
       FILTER scan.siteKey == ${siteKey}
@@ -334,7 +334,7 @@ export class ArangoDBService {
     return cursor.all();
   }
 
-  async getViolationsForScan(scanKey: string): Promise<Violation[]> {
+  async getViolationsForScan(scanKey        )                       {
     const cursor = await this.db.query(aql`
       FOR violation IN violations
       FILTER violation.scanKey == ${scanKey}
@@ -344,7 +344,7 @@ export class ArangoDBService {
     return cursor.all();
   }
 
-  async getTopSites(limit: number = 100): Promise<Site[]> {
+  async getTopSites(limit         = 100)                  {
     const cursor = await this.db.query(aql`
       FOR site IN sites
       FILTER site.currentScore > 0
@@ -355,7 +355,7 @@ export class ArangoDBService {
     return cursor.all();
   }
 
-  async getCommonViolations(limit: number = 10): Promise<any[]> {
+  async getCommonViolations(limit         = 10)                 {
     const cursor = await this.db.query(aql`
       FOR violation IN violations
       COLLECT wcagCriterion = violation.wcagCriterion WITH COUNT INTO count
@@ -369,7 +369,7 @@ export class ArangoDBService {
     return cursor.all();
   }
 
-  async getSiteViolationTrend(siteKey: string, days: number = 30): Promise<any[]> {
+  async getSiteViolationTrend(siteKey        , days         = 30)                 {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
@@ -386,7 +386,7 @@ export class ArangoDBService {
     return cursor.all();
   }
 
-  async getOrganizationSites(orgKey: string): Promise<Site[]> {
+  async getOrganizationSites(orgKey        )                  {
     const cursor = await this.db.query(aql`
       FOR org IN organizations
       FILTER org._key == ${orgKey}
@@ -397,8 +397,8 @@ export class ArangoDBService {
   }
 }
 
-export function createArangoDBService(config?: Partial<ArangoConfig>): ArangoDBService {
-  const defaultConfig: ArangoConfig = {
+export function createArangoDBService(config                        )                  {
+  const defaultConfig               = {
     url: process.env.ARANGO_URL || 'http://localhost:8529',
     database: process.env.ARANGO_DATABASE || 'accessibility',
     username: process.env.ARANGO_USERNAME || 'root',

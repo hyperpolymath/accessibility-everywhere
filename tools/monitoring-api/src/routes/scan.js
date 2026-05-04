@@ -40,7 +40,7 @@ scanRouter.post('/', async (req, res, next) => {
 
     // Store in database
     let site = await db.getSiteByUrl(url);
-    let siteKey: string;
+    let siteKey        ;
 
     if (!site) {
       // Create new site
@@ -52,7 +52,7 @@ scanRouter.post('/', async (req, res, next) => {
         scanCount: 1,
         currentScore: result.score,
         status: 'active',
-      } as any);
+      }       );
       siteKey = siteDoc._key;
     } else {
       // Update existing site
@@ -77,7 +77,7 @@ scanRouter.post('/', async (req, res, next) => {
       wcagLevel,
       duration: result.duration,
       userAgent: result.metadata.userAgent,
-    } as any);
+    }       );
 
     // Store violations
     for (const violation of result.violations) {
@@ -94,7 +94,7 @@ scanRouter.post('/', async (req, res, next) => {
           html: node.html,
           timestamp: new Date(),
           fixed: false,
-        } as any);
+        }       );
       }
     }
 

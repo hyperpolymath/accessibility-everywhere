@@ -15,7 +15,7 @@ class MockCLI {
   version = "1.0.0";
   name = "accessibility-scan";
 
-  help(): string {
+  help()         {
     return `
 ${this.name} v${this.version}
 Command-line tool for accessibility scanning
@@ -46,7 +46,7 @@ EXAMPLES:
     `;
   }
 
-  validateUrl(url: string): { valid: boolean; error?: string } {
+  validateUrl(url        )                                     {
     try {
       new URL(url);
       return { valid: true };
@@ -58,15 +58,15 @@ EXAMPLES:
     }
   }
 
-  parseArgs(args: string[]): {
-    command?: string;
-    url?: string;
-    options: Record<string, string | boolean>;
-    error?: string;
-  } {
-    const options: Record<string, string | boolean> = {};
-    let command: string | undefined;
-    let url: string | undefined;
+  parseArgs(args          )   
+                     
+                 
+                                              
+                   
+    {
+    const options                                   = {};
+    let command                    ;
+    let url                    ;
 
     for (let i = 0; i < args.length; i++) {
       const arg = args[i];

@@ -24,7 +24,7 @@ program
   .option('-o, --output <file>', 'Output file for results (JSON)')
   .option('-f, --format <format>', 'Output format (json, table, markdown)', 'table')
   .option('--screenshot', 'Take screenshot')
-  .action(async (url: string, options: any) => {
+  .action(async (url        , options     ) => {
     const spinner = ora('Scanning for accessibility issues...').start();
 
     try {
@@ -70,7 +70,7 @@ program
             colWidths: [12, 50, 10, 15],
           });
 
-          result.violations.forEach((v: any) => {
+          result.violations.forEach((v     ) => {
             violationsTable.push([
               getImpactColor(v.impact) + v.impact + chalk.reset(),
               v.description,
@@ -97,7 +97,7 @@ program
 
       // Exit with error code if violations found
       process.exit(result.violations.length > 0 ? 1 : 0);
-    } catch (error: any) {
+    } catch (error     ) {
       spinner.fail('Scan failed');
       console.error(chalk.red(error.message));
       process.exit(1);
@@ -112,7 +112,7 @@ program
   .option('-l, --level <level>', 'WCAG level (A, AA, AAA)', 'AA')
   .option('--min-score <score>', 'Minimum required score', '70')
   .option('--fail-on-violations', 'Fail if any violations found')
-  .action(async (url: string, options: any) => {
+  .action(async (url        , options     ) => {
     const spinner = ora('Running CI scan...').start();
 
     try {
@@ -142,7 +142,7 @@ program
 
       console.log(chalk.green('✓ Passed all checks'));
       process.exit(0);
-    } catch (error: any) {
+    } catch (error     ) {
       spinner.fail('CI scan failed');
       console.error(chalk.red(error.message));
       process.exit(1);
@@ -156,7 +156,7 @@ program
   .argument('<file>', 'File containing URLs (one per line)')
   .option('-l, --level <level>', 'WCAG level (A, AA, AAA)', 'AA')
   .option('-o, --output <dir>', 'Output directory for results', './scan-results')
-  .action(async (file: string, options: any) => {
+  .action(async (file        , options     ) => {
     try {
       const urls = (await fs.readFile(file, 'utf-8'))
         .split('\n')
@@ -186,7 +186,7 @@ program
 
           spinner.succeed(`${url} - Score: ${result.score}`);
           completed++;
-        } catch (error: any) {
+        } catch (error     ) {
           spinner.fail(`${url} - ${error.message}`);
           failed++;
         }
@@ -196,14 +196,14 @@ program
       if (failed > 0) {
         console.log(chalk.red(`✗ Failed: ${failed}`));
       }
-    } catch (error: any) {
+    } catch (error     ) {
       console.error(chalk.red(error.message));
       process.exit(1);
     }
   });
 
 // Helper functions
-function getGrade(score: number): string {
+function getGrade(score        )         {
   if (score >= 90) return 'A';
   if (score >= 80) return 'B';
   if (score >= 70) return 'C';
@@ -211,14 +211,14 @@ function getGrade(score: number): string {
   return 'F';
 }
 
-function getScoreColor(score: number): string {
+function getScoreColor(score        )         {
   if (score >= 90) return chalk.green.bold('');
   if (score >= 70) return chalk.yellow.bold('');
   return chalk.red.bold('');
 }
 
-function getImpactColor(impact: string): string {
-  const colors: Record<string, any> = {
+function getImpactColor(impact        )         {
+  const colors                      = {
     critical: chalk.red.bold(''),
     serious: chalk.red(''),
     moderate: chalk.yellow(''),
@@ -227,13 +227,13 @@ function getImpactColor(impact: string): string {
   return colors[impact] || '';
 }
 
-function generateMarkdown(result: any, url: string): string {
+function generateMarkdown(result     , url        )         {
   let md = `# Accessibility Report\n\n`;
   md += `**URL:** ${url}\n`;
   md += `**Score:** ${result.score}/100\n\n`;
   md += `## Violations\n\n`;
 
-  result.violations.forEach((v: any, i: number) => {
+  result.violations.forEach((v     , i        ) => {
     md += `### ${i + 1}. ${v.help}\n\n`;
     md += `- **Impact:** ${v.impact}\n`;
     md += `- **Instances:** ${v.nodes.length}\n`;
