@@ -1,0 +1,43 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Externs — compatibility shim for @accessibility-everywhere/github-action.
+// TODO: migrate to .affex once that filesystem is specified.
+
+module Externs;
+
+pub extern type Octokit;
+pub extern type Context;
+pub extern type PullRequest;
+
+pub type RepoRef = { owner: String, repo: String }
+
+pub type CreateCommentArgs = {
+  owner: String,
+  repo: String,
+  issue_number: Int,
+  body: String,
+}
+
+// ── @actions/core surface ─────────────────────────────────────────────────────
+
+pub effect Action {
+  fn get_input(name: ref String) -> String;
+  fn get_input_required(name: ref String) -> String;
+  fn info(msg: ref String) -> ();
+  fn warning(msg: ref String) -> ();
+  fn set_failed(msg: ref String) -> ();
+  fn set_output_str(name: ref String, value: ref String) -> ();
+  fn set_output_int(name: ref String, value: Int) -> ();
+  fn summary_add_raw(markdown: ref String) -> ();
+  fn summary_write() -> ();
+}
+
+// ── @actions/github surface ───────────────────────────────────────────────────
+
+pub effect Github {
+  fn context() -> Context;
+  fn context_repo(ctx: ref Context) -> RepoRef;
+  fn context_pull_request(ctx: ref Context) -> Option[PullRequest];
+  fn pull_request_number(pr: ref PullRequest) -> Int;
+  fn get_octokit(token: ref String) -> own Octokit;
+  fn create_comment(octo: mut Octokit, args: ref CreateCommentArgs) -> ();
+}

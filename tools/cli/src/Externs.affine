@@ -1,0 +1,96 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Externs — compatibility shim for @accessibility-everywhere/cli.
+// TODO: migrate to .affex once that filesystem is specified.
+
+module Externs;
+
+// ── Opaque types from the TS dependency surface ───────────────────────────────
+
+pub extern type Program;       // commander Command
+pub extern type Cmd;
+pub extern type Spinner;       // ora
+pub extern type Table;         // cli-table3
+
+// ── Terminal IO (stdout/stderr) ───────────────────────────────────────────────
+//
+// Per Q3, terminal output is the *only* domain where the existing warmup
+// `IO` effect applies. console.log/error from the TS map cleanly here.
+
+pub effect IO {
+  fn println(s: ref String) -> ();
+  fn eprintln(s: ref String) -> ();
+}
+
+// ── Process control ───────────────────────────────────────────────────────────
+
+pub effect Process {
+  fn exit(code: Int) -> Never;
+}
+
+// ── File system ───────────────────────────────────────────────────────────────
+
+pub type WriteJsonOpts = { spaces: Int }
+
+pub effect Fs {
+  fn read_file_utf8(path: ref String) -> String;
+  fn write_json[D](path: ref String, doc: D, opts: ref WriteJsonOpts) -> ();
+  fn ensure_dir(path: ref String) -> ();
+}
+
+// ── Path joining ──────────────────────────────────────────────────────────────
+
+pub effect Path {
+  fn join(a: ref String, b: ref String) -> String;
+}
+
+// ── Commander surface ─────────────────────────────────────────────────────────
+
+pub effect Commander {
+  fn make_program() -> own Program;
+  fn set_name(p: mut Program, name: ref String) -> ();
+  fn set_description(p: mut Program, desc: ref String) -> ();
+  fn set_version(p: mut Program, v: ref String) -> ();
+  fn command(p: mut Program, name: ref String) -> mut Cmd;
+  fn cmd_description(c: mut Cmd, desc: ref String) -> ();
+  fn cmd_argument(c: mut Cmd, spec: ref String, desc: ref String) -> ();
+  fn cmd_option(c: mut Cmd, spec: ref String, desc: ref String) -> ();
+  fn cmd_option_default(
+    c: mut Cmd, spec: ref String, desc: ref String, default: ref String
+  ) -> ();
+  fn cmd_action[H](c: mut Cmd, handler: H) -> ();
+  fn parse(p: mut Program) -> ();
+}
+
+// ── Ora (spinners) ────────────────────────────────────────────────────────────
+
+pub effect Spinner {
+  fn make(text: ref String) -> own Spinner;
+  fn start(s: mut Spinner) -> ();
+  fn succeed(s: mut Spinner, msg: ref String) -> ();
+  fn fail(s: mut Spinner, msg: ref String) -> ();
+}
+
+// ── Chalk (terminal colours) — pure string transformations ────────────────────
+
+pub effect Style {
+  fn red(s: ref String) -> String;
+  fn green(s: ref String) -> String;
+  fn yellow(s: ref String) -> String;
+  fn blue(s: ref String) -> String;
+  fn gray(s: ref String) -> String;
+  fn bold(s: ref String) -> String;
+  fn red_bold(s: ref String) -> String;
+  fn green_bold(s: ref String) -> String;
+  fn yellow_bold(s: ref String) -> String;
+  fn blue_bold(s: ref String) -> String;
+}
+
+// ── cli-table3 ────────────────────────────────────────────────────────────────
+
+pub type TableInit = { head: List[String], col_widths: List[Int] }
+
+pub effect TableBuilder {
+  fn make(init: ref TableInit) -> own Table;
+  fn push(t: mut Table, row: ref List[String]) -> ();
+  fn render(t: ref Table) -> String;
+}

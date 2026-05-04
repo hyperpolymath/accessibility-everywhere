@@ -1,0 +1,144 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Cli — accessibility-scan CLI. Re-decomposed from src/cli.ts.
+//
+// Decomposition:
+//   * Per-command IIFE callback in commander → standalone fn per command
+//   * try/catch around each action            → effect-row composition;
+//                                                Process.exit on failure path
+//   * Inline chalk colour calls                → Style effect (no chained API)
+//   * `as any` on result                       → typed shim Violation/PassDetail
+
+module Cli;
+
+use Externs;
+
+pub type WcagLevel = A | AA | AAA
+pub type Format    = Json | Table | Markdown
+pub type Impact    = Critical | Serious | Moderate | Minor
+
+pub type NodeShim    = {}
+pub type Violation   = {
+  impact: Impact,
+  description: String,
+  help: String,
+  help_url: String,
+  nodes: List[NodeShim],
+  tags: List[String],
+}
+
+pub type ScanResult = {
+  score: Int,
+  violations: List[Violation],
+  passes: List[{}],
+  incomplete: List[{}],
+}
+
+pub fn parse_wcag_level(s: ref String) -> WcagLevel {
+  match s {
+    "A"   => A
+    "AAA" => AAA
+    _     => AA
+  }
+}
+
+pub fn parse_format(s: ref String) -> Format {
+  match s {
+    "json"     => Json
+    "markdown" => Markdown
+    _          => Table
+  }
+}
+
+pub fn get_grade(score: Int) -> String {
+  if score >= 90 { "A" }
+  else if score >= 80 { "B" }
+  else if score >= 70 { "C" }
+  else if score >= 60 { "D" }
+  else { "F" }
+}
+
+pub fn impact_colored(i: ref Impact) -{Externs.Style}-> String {
+  match i {
+    Critical => Externs.red_bold("critical")
+    Serious  => Externs.red("serious")
+    Moderate => Externs.yellow("moderate")
+    Minor    => Externs.blue("minor")
+  }
+}
+
+pub fn score_colored(score: Int) -{Externs.Style}-> String {
+  // TODO: int-to-string once stdlib lands; sketch only.
+  let s = "<score>";
+  if score >= 90      { Externs.green_bold(s) }
+  else if score >= 70 { Externs.yellow_bold(s) }
+  else                { Externs.red_bold(s) }
+}
+
+// ── Commands ──────────────────────────────────────────────────────────────────
+//
+// Each command is a fn over the effects it actually uses. The effect rows
+// make the impurity surface visible in a way the TS callbacks did not.
+
+pub fn scan_action(
+  url: ref String,
+  level: ref String,
+  format: ref String,
+  output: Option[String],
+  screenshot: Bool
+) -{Externs.IO + Externs.Spinner + Externs.Style + Externs.Fs +
+   Externs.TableBuilder + Externs.Process}-> () {
+  // TODO: implement when Node-target lands. Decomposition matches TS:
+  //   1. Spinner.make("Scanning…") + start
+  //   2. Scanner.scan(opts) — cross-pkg call once .affex resolves
+  //   3. spinner.succeed; print header bar + summary table
+  //   4. format-dispatch (table/markdown/json) for violation listing
+  //   5. Fs.write_json if output set
+  //   6. Process.exit(1) on violations, else 0
+  let _ = url; let _ = level; let _ = format; let _ = output; let _ = screenshot;
+  ()
+}
+
+pub fn ci_action(
+  url: ref String,
+  level: ref String,
+  min_score: Int,
+  fail_on_violations: Bool
+) -{Externs.IO + Externs.Spinner + Externs.Style + Externs.Process}-> () {
+  // TODO: implement. Decomposition matches TS ci command —
+  // scan, compare score against min_score, exit(1) on failures.
+  let _ = url; let _ = level; let _ = min_score; let _ = fail_on_violations;
+  ()
+}
+
+pub fn batch_action(
+  file: ref String,
+  level: ref String,
+  output_dir: ref String
+) -{Externs.IO + Externs.Spinner + Externs.Style + Externs.Fs + Externs.Path +
+   Externs.Process}-> () {
+  // TODO: implement. Decomposition matches TS batch command —
+  // read URL list from file, ensure_dir(output_dir), iterate scans,
+  // write each result to disk with sanitised filename, summarise counts.
+  let _ = file; let _ = level; let _ = output_dir;
+  ()
+}
+
+// ── Program wiring ────────────────────────────────────────────────────────────
+
+pub fn build_program() -{Externs.Commander}-> own Program {
+  let p = Externs.make_program();
+  Externs.set_name(p, "accessibility-scan");
+  Externs.set_description(p, "Command-line tool for accessibility scanning");
+  Externs.set_version(p, "1.0.0");
+
+  // TODO: wire scan_action / ci_action / batch_action via Externs.cmd_action.
+  //       Commander's options API maps to Externs.cmd_option_default; arguments
+  //       to Externs.cmd_argument. Sketch matches the three commands defined
+  //       in cli.ts (scan / ci / batch).
+  p
+}
+
+pub fn main() -{Externs.Commander}-> () {
+  let p = build_program();
+  Externs.parse(p)
+}

@@ -1,0 +1,27 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Public surface for @accessibility-everywhere/scanner.
+
+module Index;
+
+use Scanner;
+
+pub type WcagLevel        = Scanner.WcagLevel
+pub type Engine           = Scanner.Engine
+pub type Impact           = Scanner.Impact
+pub type ScanOptions      = Scanner.ScanOptions
+pub type ScanResult       = Scanner.ScanResult
+pub type ViolationDetail  = Scanner.ViolationDetail
+pub type PassDetail       = Scanner.PassDetail
+pub type IncompleteDetail = Scanner.IncompleteDetail
+pub type NodeDetail       = Scanner.NodeDetail
+
+pub fn make_scanner() -{Externs.Fs}-> own Scanner.Scanner {
+  Scanner.make_scanner()
+}
+
+pub fn scan(
+  scanner: ref Scanner.Scanner,
+  opts: ref Scanner.ScanOptions
+) -{Externs.Browser + Externs.Clock}-> Scanner.ScanResult {
+  Scanner.scan(scanner, opts)
+}

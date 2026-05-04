@@ -1,0 +1,101 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Externs — compatibility shim for @accessibility-everywhere/monitoring-api.
+// TODO: migrate to .affex once that filesystem is specified.
+
+module Externs;
+
+// ── Express opaque types ──────────────────────────────────────────────────────
+
+pub extern type App;
+pub extern type Router;
+pub extern type Req;
+pub extern type Res;
+
+// ── Net effect — server lifecycle, routing, request/response surface ──────────
+//
+// One named effect `Net` covers everything Express does: it's the network /
+// HTTP-server domain. Middleware and routing are first-order ops on App/Router;
+// per-request state (req.params/body/query, res.json/status) is also Net.
+
+pub effect Net {
+  // App lifecycle
+  fn make_app() -> own App;
+  fn use_helmet(app: mut App) -> ();
+  fn use_cors(app: mut App) -> ();
+  fn use_compression(app: mut App) -> ();
+  fn use_json_parser(app: mut App, limit: ref String) -> ();
+  fn use_rate_limit(app: mut App, path: ref String, window_ms: Int, max: Int, msg: ref String) -> ();
+  fn listen(app: mut App, port: Int, on_ready: fn() -{Externs.IO}-> ()) -> ();
+
+  // Top-level routes
+  fn get_app[H](app: mut App, path: ref String, handler: H) -> ();
+  fn use_router(app: mut App, path: ref String, router: own Router) -> ();
+  fn use_error_handler[H](app: mut App, handler: H) -> ();
+  fn use_not_found_handler[H](app: mut App, handler: H) -> ();
+
+  // Router
+  fn make_router() -> own Router;
+  fn router_get[H](r: mut Router, path: ref String, h: H) -> ();
+  fn router_post[H](r: mut Router, path: ref String, h: H) -> ();
+  fn router_patch[H](r: mut Router, path: ref String, h: H) -> ();
+
+  // Request accessors
+  fn req_body[B](req: ref Req) -> B;
+  fn req_param(req: ref Req, name: ref String) -> String;
+  fn req_query(req: ref Req, name: ref String) -> Option[String];
+  fn req_protocol(req: ref Req) -> String;
+  fn req_header(req: ref Req, name: ref String) -> String;
+
+  // Response builders
+  fn res_status(res: mut Res, code: Int) -> ();
+  fn res_json[B](res: mut Res, body: B) -> ();
+  fn res_send(res: mut Res, body: ref String) -> ();
+  fn res_header(res: mut Res, name: ref String, value: ref String) -> ();
+}
+
+// ── Joi extern ────────────────────────────────────────────────────────────────
+
+pub extern type Schema;
+
+pub type ValidationError = {
+  message: String,
+}
+
+pub type ValidationResult[V] = {
+  error: Option[ValidationError],
+  value: V,
+}
+
+pub effect Joi {
+  fn object_schema(fields: List[(String, Schema)]) -> own Schema;
+  fn string_schema() -> own Schema;
+  fn boolean_schema() -> own Schema;
+  fn s_uri(s: mut Schema) -> ();
+  fn s_required(s: mut Schema) -> ();
+  fn s_valid(s: mut Schema, options: ref List[String]) -> ();
+  fn s_default_str(s: mut Schema, default: ref String) -> ();
+  fn s_default_bool(s: mut Schema, default: Bool) -> ();
+  fn validate[I, V](schema: ref Schema, input: I) -> ValidationResult[V];
+}
+
+// ── Dotenv (env loading at boot) ──────────────────────────────────────────────
+
+pub effect Dotenv {
+  fn config() -> ();
+}
+
+// ── Shared IO + Process effects (for console + process.exit + clock) ──────────
+
+pub effect IO {
+  fn println(s: ref String) -> ();
+  fn eprintln(s: ref String) -> ();
+}
+
+pub effect Process {
+  fn env(name: ref String) -> Option[String];
+  fn exit(code: Int) -> Never;
+}
+
+pub effect Clock {
+  fn now_iso() -> String;
+}

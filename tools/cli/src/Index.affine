@@ -1,0 +1,8 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+module Index;
+
+use Cli;
+
+pub fn main() -{Externs.Commander}-> () {
+  Cli.main()
+}
