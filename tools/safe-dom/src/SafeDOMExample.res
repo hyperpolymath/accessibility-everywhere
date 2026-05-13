@@ -10,10 +10,10 @@ let mountApp = () => {
     "<div><h1>Hello, World!</h1><p>Mounted safely with proofs.</p></div>",
     ~onSuccess=el => {
       Console.log("✓ App mounted successfully!")
-      Console.log("Element:", el)
+      Console.log2("Element:", el)
     },
     ~onError=err => {
-      Console.error("✗ Mount failed:", err)
+      Console.error2("✗ Mount failed:", err)
     }
   )
 }
@@ -24,7 +24,7 @@ let mountWhenDOMReady = () => {
     "#app",
     "<div class='container'><h1>App Title</h1></div>",
     ~onSuccess=_ => Console.log("✓ Mounted after DOM ready"),
-    ~onError=err => Console.error("✗ Failed:", err)
+    ~onError=err => Console.error2("✗ Failed:", err)
   )
 }
 
@@ -39,11 +39,11 @@ let mountMultiple = () => {
 
   switch mountBatch(specs) {
   | Ok(elements) => {
-      Console.log(`✓ Successfully mounted ${Array.length(elements)} elements`)
-      elements->Array.forEach(el => Console.log("  -", el))
+      Console.log(`✓ Successfully mounted ${Array.length(elements)->Int.toString} elements`)
+      elements->Array.forEach(el => Console.log2("  -", el))
     }
   | Error(err) => {
-      Console.error("✗ Batch mount failed:", err)
+      Console.error2("✗ Batch mount failed:", err)
       Console.error("  (None were mounted - atomic operation)")
     }
   }
@@ -61,7 +61,7 @@ let mountWithValidation = () => {
       | Ok(validHtml) => {
           // Now mount with proven safety
           switch mount(validSelector, validHtml) {
-          | Mounted(el) => Console.log("✓ Mounted with validated inputs:", el)
+          | Mounted(el) => Console.log2("✓ Mounted with validated inputs:", el)
           | MountPointNotFound(s) => Console.error(`✗ Element not found: ${s}`)
           | InvalidSelector(_) => Console.error("Impossible - already validated")
           | InvalidHTML(_) => Console.error("Impossible - already validated")
@@ -69,6 +69,7 @@ let mountWithValidation = () => {
         }
       }
     }
+  }
 }
 
 // Example 5: Integration with TEA
@@ -88,7 +89,7 @@ let mountTEAApp = () => {
   mountWhenReady(
     "#tea-app",
     html,
-    ~onSuccess=el => {
+    ~onSuccess=_el => {
       Console.log("✓ TEA app mounted")
       // Set up event handlers, subscriptions here
     },
@@ -106,4 +107,4 @@ let main = () => {
 }
 
 // Auto-execute when module loads
-main()
+let _ = main()
