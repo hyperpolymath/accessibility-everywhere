@@ -124,7 +124,7 @@ pub fn make_service(config: ref ArangoConfig) -{Externs.Db}-> own Service {
   // Placeholder — implementation deferred until Node-target lands.
   // Body intentionally uses a single Externs.Db op to keep the effect row
   // honest.
-  let _db = Externs.open_database({
+  let _db = Externs.open_database(#{
     url: config.url,
     database_name: config.database,
     username: config.username,
@@ -230,7 +230,7 @@ pub fn create_service_from_env() -{Externs.Db + Externs.Process}-> own Service {
   let database = Externs.env("ARANGO_DATABASE"  ) |> default_or("accessibility");
   let username = Externs.env("ARANGO_USERNAME"  ) |> default_or("root");
   let password = Externs.env("ARANGO_PASSWORD"  ) |> default_or("development");
-  make_service({
+  make_service(#{
     url: url,
     database: database,
     username: username,

@@ -81,7 +81,7 @@ pub type Scanner = own {
 pub fn make_scanner() -{Externs.Fs}-> own Scanner {
   let path = Externs.require_resolve("axe-core/axe.min.js");
   let src  = Externs.read_file_sync(path);
-  Scanner { axe_source: src }
+  Scanner #{ axe_source: src }
 }
 
 // SCORING KERNEL: penalty weights per impact:

@@ -94,7 +94,7 @@ pub type AppState = {
 
 pub fn respond_error(res: mut Externs.Res, status: Int, msg: ref String) -{Externs.Net}-> () {
   Externs.res_status(res, status);
-  Externs.res_json(res, { error: { message: msg, status: status } })
+  Externs.res_json(res, #{ error: #{ message: msg, status: status } })
 }
 
 pub fn parse_wcag_level(s: ref String) -> WcagLevel {
