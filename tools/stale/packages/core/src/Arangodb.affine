@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // Arangodb — full re-decomposition of the TS arangodb.ts (409 LOC).
 // Tagged-template aql queries lifted into bind-vars form per the playbook.
 

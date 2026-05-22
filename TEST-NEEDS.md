@@ -142,7 +142,7 @@ tools/
 3. Benchmarks baseline established
 4. TEST-NEEDS.md updated with completion status
 5. STATE.a2ml updated with test coverage metrics
-6. Code commits with proper SPDX headers (PMPL-1.0-or-later)
+6. Code commits with proper SPDX headers (MPL-2.0)
 
 ## Notes
 - Mock the scanner to avoid real HTTP requests in tests

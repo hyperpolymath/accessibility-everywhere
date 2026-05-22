@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // Externs — compatibility shim for @accessibility-everywhere/github-action.
 // TODO: migrate to .affex once that filesystem is specified.
 

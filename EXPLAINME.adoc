@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // SPDX-FileCopyrightText: 2024 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 
 = Accessibility Everywhere — Show Me The Receipts
@@ -151,7 +151,7 @@ The leaderboard has known limitations:
 | **Hyperpolymath Language Policy** | ReScript for dashboard (no TypeScript), Node.js for API (exception: JS ecosystem tooling unavoidable)
 | Compliant; Node.js API transitioning to Deno in Phase 3
 
-| **PMPL-1.0-or-later License** | Primary; fallback to MPL-2.0 for browser extension store requirements
+| **MPL-2.0 License** | Primary; fallback to MPL-2.0 for browser extension store requirements
 | Declared at repo root; browser extension uses MPL-2.0 due to Chrome Web Store/Firefox Add-ons policies
 
 | **PanLL Integration** | Pre-built monitoring panel for API health and scan queue depth

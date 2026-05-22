@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // SafeDOM: proven-input wrappers around document.querySelector + innerHTML mounting.
 // "Proven" types carry validation evidence: once you have a ProvenSelector.t or
 // ProvenHTML.t, mount can no longer fail on the input-shape branch. The mountSafe
