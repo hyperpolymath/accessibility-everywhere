@@ -1,9 +1,36 @@
 {
+  "$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
+  "name": "@hyperpolymath/accessibility-everywhere",
+  "version": "1.0.0",
+  "license": "MIT",
+  "workspace": [
+    "./tools/cli",
+    "./tools/github-action",
+    "./tools/monitoring-api",
+    "./tools/safe-dom",
+    "./tools/stale/packages/core",
+    "./tools/stale/packages/scanner"
+  ],
   "tasks": {
+    "setup": "deno run --allow-read --allow-write --allow-net --allow-env scripts/setup-arangodb.js",
     "dev": "deno run --watch mod.ts",
+    "build": "deno task build:cli && deno task build:safe-dom && deno task build:scanner",
+    "build:cli": "deno task --cwd tools/cli build",
+    "build:safe-dom": "deno task --cwd tools/safe-dom build",
+    "build:scanner": "deno task --cwd tools/stale/packages/scanner build",
+    "build:browser-extension": "echo 'tools/browser-extension is a Class C browser-extension package (host requires the npm-published archiver). Use the existing scripts in tools/browser-extension/.'",
     "test": "deno test",
     "lint": "deno lint",
-    "fmt": "deno fmt"
+    "fmt": "deno fmt",
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
   },
-  "compilerOptions": { "strict": true }
+  "compilerOptions": { "strict": true },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "singleQuote": false
+  }
 }
