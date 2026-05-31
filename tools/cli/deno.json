@@ -1,0 +1,21 @@
+{
+  "$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
+  "name": "@accessibility-everywhere/cli",
+  "version": "1.0.0",
+  "license": "MIT",
+  "tasks": {
+    "build": "deno run -A --node-modules-dir=auto npm:rescript@^12.0.0",
+    "clean": "deno run -A --node-modules-dir=auto npm:rescript@^12.0.0 clean",
+    "dev": "deno run -A --node-modules-dir=auto npm:rescript@^12.0.0 -w"
+  },
+  "imports": {
+    "rescript": "npm:rescript@^12.0.0",
+    "@rescript/core": "npm:@rescript/core@^1.6.0",
+    "commander": "npm:commander@^11.0.0",
+    "chalk": "npm:chalk@^5.0.0",
+    "ora": "npm:ora@^7.0.0",
+    "cli-table3": "npm:cli-table3@^0.6.0",
+    "fs-extra": "npm:fs-extra@^11.0.0"
+  },
+  "nodeModulesDir": "auto"
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
+  "name": "@accessibility-everywhere/scanner",
+  "version": "1.0.0",
+  "license": "MIT",
+  "tasks": {
+    "build": "deno run -A --node-modules-dir=auto npm:rescript@^11.1.0",
+    "clean": "deno run -A --node-modules-dir=auto npm:rescript@^11.1.0 clean",
+    "dev": "deno run -A --node-modules-dir=auto npm:rescript@^11.1.0 -w"
+  },
+  "imports": {
+    "rescript": "npm:rescript@^11.1.0",
+    "@rescript/core": "npm:@rescript/core@^1.5.0",
+    "axe-core": "npm:axe-core@^4.8.0",
+    "playwright": "npm:playwright@^1.40.0",
+    "puppeteer": "npm:puppeteer@^24.0.0"
+  },
+  "nodeModulesDir": "auto"
+}
