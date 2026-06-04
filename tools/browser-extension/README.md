@@ -1,3 +1,7 @@
+<!--
+SPDX-License-Identifier: MPL-2.0
+Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+-->
 # Accessibility Everywhere Browser Extension
 
 Real-time accessibility scanning and scoring for web pages using axe-core.

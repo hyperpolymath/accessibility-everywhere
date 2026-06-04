@@ -1,3 +1,7 @@
+<!--
+SPDX-License-Identifier: MPL-2.0
+Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+-->
 # @accessibility-everywhere/react
 
 Production-ready accessible React components following WCAG 2.1 Level AA standards.

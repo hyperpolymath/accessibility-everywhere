@@ -1,3 +1,7 @@
+<!--
+SPDX-License-Identifier: MPL-2.0
+Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+-->
 # Accessibility Everywhere WordPress Plugin
 
 Real-time accessibility checking for WordPress. Scan content before publishing, track violations, and improve WCAG compliance.

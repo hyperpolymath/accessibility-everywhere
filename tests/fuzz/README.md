@@ -1,3 +1,7 @@
+<!--
+SPDX-License-Identifier: MPL-2.0
+Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+-->
 # Fuzzing for Accessibility Everywhere
 
 This directory contains fuzzing configurations and targets for automated testing of accessibility scanners and parsers.

@@ -1,3 +1,7 @@
+<!--
+SPDX-License-Identifier: MPL-2.0
+Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+-->
 # OpenSSF Best Practices (CII) Adherence
 
 This document tracks the project's adherence to the [OpenSSF Best Practices Badge](https://best-practices.coreinfrastructure.org/) criteria.

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+// Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 // Accessibility Everywhere Testing Dashboard
 const API_BASE = 'https://api.accessibility-everywhere.org/v1';
 const LOCAL_API = 'http://localhost:3000/v1';
