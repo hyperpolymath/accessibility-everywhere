@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0-or-later
 name: PHP Security Check
-<<<<<<< HEAD
 on:
   push:
     branches: [main, master]
@@ -12,9 +11,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-=======
 on: [push, pull_request]
->>>>>>> 11930ef (security: standardize secret scanning on TruffleHog)
 permissions:
   contents: read
 jobs:
