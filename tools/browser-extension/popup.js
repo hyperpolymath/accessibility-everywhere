@@ -86,10 +86,15 @@ function displayResults(results) {
   incompleteCountEl.textContent = results.incomplete.length;
 
   // Display violations
-  violationsDetailsEl.innerHTML = '';
+  violationsDetailsEl.replaceChildren();
 
   if (results.violations.length === 0) {
-    violationsDetailsEl.innerHTML = '<p style="text-align: center; color: #28a745; font-weight: 600;">No violations found! 🎉</p>';
+    const successMsg = document.createElement('p');
+    successMsg.style.textAlign = 'center';
+    successMsg.style.color = '#28a745';
+    successMsg.style.fontWeight = '600';
+    successMsg.textContent = 'No violations found! 🎉';
+    violationsDetailsEl.appendChild(successMsg);
   } else {
     // Group violations by impact
     const grouped = groupByImpact(results.violations);
