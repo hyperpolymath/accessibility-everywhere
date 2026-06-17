@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0-or-later
 name: PHP Security Check
+<<<<<<< HEAD
 on:
   push:
     branches: [main, master]
@@ -11,9 +12,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+=======
+on: [push, pull_request]
+>>>>>>> 11930ef (security: standardize secret scanning on TruffleHog)
 permissions:
   contents: read
-
 jobs:
   security:
     runs-on: ubuntu-latest
@@ -22,7 +25,6 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.1
-
       - name: PHP Security Scan
         run: |
           # Check for dangerous functions
@@ -31,19 +33,19 @@ jobs:
             echo "⚠️ Potentially dangerous PHP functions found:"
             echo "$DANGEROUS"
           fi
-          
+
           # Check for SQL injection patterns
           SQLI=$(grep -rE '\$_(GET|POST|REQUEST).*query|mysqli_query.*\$_' --include="*.php" . 2>/dev/null | grep -v 'vendor/' | head -5 || true)
           if [ -n "$SQLI" ]; then
             echo "⚠️ Potential SQL injection patterns:"
             echo "$SQLI"
           fi
-          
+
           # Check for XSS patterns
           XSS=$(grep -rE 'echo\s+\$_(GET|POST|REQUEST)' --include="*.php" . 2>/dev/null | grep -v 'vendor/' | head -5 || true)
           if [ -n "$XSS" ]; then
             echo "⚠️ Potential XSS patterns (unescaped output):"
             echo "$XSS"
           fi
-          
+
           echo "✅ PHP security scan completed"

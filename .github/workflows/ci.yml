@@ -1,15 +1,12 @@
 # SPDX-License-Identifier: MPL-2.0-or-later
 name: CI/CD Pipeline
-
 on:
   push:
-    branches: [ main, develop, 'claude/**' ]
+    branches: [main, develop, 'claude/**']
   pull_request:
-    branches: [ main, develop ]
-
+    branches: [main, develop]
 permissions:
   contents: read
-
 jobs:
   # RSR Compliance Check
   rsr-compliance:
@@ -20,15 +17,12 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.1
-
       - name: Setup Node.js
         uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
         with:
           node-version: '20'
-
       - name: Check RSR Compliance
         run: node scripts/check-rsr-compliance.js
-
   # Lint and Format
   lint:
     name: Lint & Format Check
@@ -38,24 +32,19 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.1
-
       - name: Setup Node.js
         uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
         with:
           node-version: '20'
           cache: 'npm'
-
       - name: Install dependencies
         run: npm ci
-
       - name: Run linter
         run: npm run lint --workspaces --if-present
         continue-on-error: true
-
       - name: Check formatting
         run: npx prettier --check "**/*.{js,ts,tsx,json,md,yml,yaml}"
         continue-on-error: true
-
   # TypeScript Type Checking
   typecheck:
     name: TypeScript Type Check
@@ -65,20 +54,16 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.1
-
       - name: Setup Node.js
         uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
         with:
           node-version: '20'
           cache: 'npm'
-
       - name: Install dependencies
         run: npm ci
-
       - name: Type check
         run: npm run typecheck --workspaces --if-present
         continue-on-error: true
-
   # Build All Packages
   build:
     name: Build All Packages
@@ -88,20 +73,16 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.1
-
       - name: Setup Node.js
         uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
         with:
           node-version: '20'
           cache: 'npm'
-
       - name: Install dependencies
         run: npm ci
-
       - name: Build packages
         run: npm run build --workspaces
         continue-on-error: true
-
       - name: Upload build artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.0
         with:
@@ -111,7 +92,6 @@ jobs:
             tools/*/dist
           retention-days: 7
         continue-on-error: true
-
   # Test Suite
   test:
     name: Test Suite
@@ -121,26 +101,21 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.1
-
       - name: Setup Node.js
         uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
         with:
           node-version: '20'
           cache: 'npm'
-
       - name: Install dependencies
         run: npm ci
-
       - name: Run tests
         run: npm test --workspaces --if-present
         continue-on-error: true
-
       - name: Upload coverage
         uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574 # v5.4.0
         with:
           files: coverage/lcov.info
         continue-on-error: true
-
   # Security Audit
   security:
     name: Security Audit
@@ -150,16 +125,13 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.1
-
       - name: Setup Node.js
         uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
         with:
           node-version: '20'
-
       - name: Run npm audit
         run: npm audit --audit-level=moderate
         continue-on-error: true
-
       - name: Check for secrets
         uses: trufflesecurity/trufflehog@ef6e76c3c4023279497fab4721ffa071a722fd05 # v3.92.4
         with:
@@ -167,7 +139,6 @@ jobs:
           base: ${{ github.event.repository.default_branch }}
           head: HEAD
         continue-on-error: true
-
   # Docker Build
   docker:
     name: Docker Build
@@ -177,14 +148,11 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.1
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@b5ca514318bd6df267d1d40129fc4270f28032d0 # v3.10.0
-
       - name: Build Docker images
         run: docker-compose build
         continue-on-error: true
-
   # Accessibility Tests
   a11y:
     name: Accessibility Tests
@@ -194,21 +162,16 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.1
-
       - name: Setup Node.js
         uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
         with:
           node-version: '20'
           cache: 'npm'
-
       - name: Install dependencies
         run: npm ci
-
       - name: Run accessibility tests
         run: npm run test:a11y --workspaces --if-present
         continue-on-error: true
-
-
   # Summary
   deno-test:
     name: Deno Tests (E2E / Property / Aspect)
@@ -218,24 +181,18 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.1
-
       - name: Setup Deno
         uses: denoland/setup-deno@e95548e56dfa95d4e1a28d6f422fafe75c4c26fb # v2.0.3
         with:
           deno-version: v2.x
-
       - name: Run CLI tests
         run: deno test --allow-net --allow-read --allow-env --allow-run tools/cli/tests/
-
       - name: Run monitoring-api E2E tests
         run: deno test --allow-net --allow-read --allow-env tools/monitoring-api/tests/e2e/
-
       - name: Run monitoring-api property tests
         run: deno test --allow-net --allow-read --allow-env tools/monitoring-api/tests/property/
-
       - name: Run monitoring-api security tests
         run: deno test --allow-net --allow-read --allow-env tools/monitoring-api/tests/aspect/
-
   ci-summary:
     name: CI Summary
     needs: [rsr-compliance, lint, typecheck, build, test, security, docker, a11y, deno-test]
@@ -244,7 +201,7 @@ jobs:
     if: always()
     steps:
       - name: Check job statuses
-        run: |
+        run: |-
           echo "RSR Compliance: ${{ needs.rsr-compliance.result }}"
           echo "Lint: ${{ needs.lint.result }}"
           echo "TypeCheck: ${{ needs.typecheck.result }}"

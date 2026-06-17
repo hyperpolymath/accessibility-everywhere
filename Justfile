@@ -342,11 +342,9 @@ sync-metadata:
 # Run security audit suite
 security:
     @echo "=== Security Audit ==="
-    @command -v gitleaks >/dev/null && gitleaks detect --source . --verbose || echo "gitleaks not found"
     @command -v trivy >/dev/null && trivy fs --severity HIGH,CRITICAL . || echo "trivy not found"
     @echo "Security audit complete"
 
-# Scan for vulnerabilities in dependencies (gitleaks/trivy)
 audit-deps:
     @echo "=== Dependency Audit ==="
     @npm audit --workspaces
@@ -488,3 +486,6 @@ crg-badge:
       D) color="orange" ;; E) color="red" ;; F) color="critical" ;; \
       *) color="lightgrey" ;; esac; \
     echo "[![CRG $$grade](https://img.shields.io/badge/CRG-$$grade-$$color?style=flat-square)](https://github.com/hyperpolymath/standards/tree/main/component-readiness-grades)"
+
+secret-scan-trufflehog:
+    @command -v trufflehog >/dev/null && trufflehog filesystem . --only-verified || true
