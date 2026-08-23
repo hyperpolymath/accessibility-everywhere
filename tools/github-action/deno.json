@@ -4,13 +4,13 @@
   "version": "1.0.0",
   "license": "MIT",
   "tasks": {
-    "build": "deno run -A --node-modules-dir=auto npm:rescript@^12.0.0",
-    "clean": "deno run -A --node-modules-dir=auto npm:rescript@^12.0.0 clean",
-    "dev": "deno run -A --node-modules-dir=auto npm:rescript@^12.0.0 -w"
+    "build": "deno run -A --node-modules-dir=auto npm:affinescript@^12.0.0",
+    "clean": "deno run -A --node-modules-dir=auto npm:affinescript@^12.0.0 clean",
+    "dev": "deno run -A --node-modules-dir=auto npm:affinescript@^12.0.0 -w"
   },
   "imports": {
-    "rescript": "npm:rescript@^12.0.0",
-    "@rescript/core": "npm:@rescript/core@^1.6.0",
+    "affinescript": "npm:affinescript@^12.0.0",
+    "@affinescript/core": "npm:@affinescript/core@^1.6.0",
     "@actions/core": "npm:@actions/core@^1.10.0",
     "@actions/github": "npm:@actions/github@^6.0.0"
   },

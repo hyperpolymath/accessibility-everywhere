@@ -6,18 +6,18 @@
   "module": "src/Index.mjs",
   "type": "module",
   "scripts": {
-    "build": "rescript build",
-    "dev": "rescript build -w",
-    "clean": "rescript clean"
+    "build": "affinescript build",
+    "dev": "affinescript build -w",
+    "clean": "affinescript clean"
   },
   "peerDependencies": {
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
   },
   "devDependencies": {
-    "rescript": "^11.1.0",
-    "@rescript/core": "^1.5.0",
-    "@rescript/react": "^0.13.0"
+    "affinescript": "^11.1.0",
+    "@affinescript/core": "^1.5.0",
+    "@affinescript/react": "^0.13.0"
   },
   "keywords": [
     "react",
@@ -27,6 +27,6 @@
     "components",
     "ui",
     "aria",
-    "rescript"
+    "affinescript"
   ]
 }
