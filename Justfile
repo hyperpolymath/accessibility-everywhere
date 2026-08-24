@@ -380,7 +380,7 @@ doctor:
     check "just"              just      "1.25" 
     check "git"               git       "2.40" 
     check "Deno"              deno      "2.0" 
-    check "ReScript (resc)"   rescript  "12.0" 
+    check "AffineScript (resc)"   affinescript  "12.0" 
     check "Zig"               zig       "0.13" 
 # Optional tools
 if command -v panic-attack >/dev/null 2>&1; then

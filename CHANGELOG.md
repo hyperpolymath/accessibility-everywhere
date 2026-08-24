@@ -20,7 +20,7 @@ this project aims to follow [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - feat(safe-dom): add minimal SafeDOM package and runnable example (#26)
-- feat(rescript): reconcile migration onto main
+- feat(affinescript): reconcile migration onto main
 - feat(affinescript): step (a) — design lock-in for Node-bound packages (#16)
 - feat(react): pilot AffineScript port of Button per migration playbook (#15)
 - feat(stapeln): add selur-compose.toml Stapeln service definition

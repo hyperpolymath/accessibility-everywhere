@@ -23,7 +23,7 @@ The browser extension (`tools/browser-extension/`) uses axe-core (Deque Systems)
 2. **Lightweight Scan**: axe-core runs a WCAG scan (user selects A/AA/AAA), produces violation array
 3. **Score Calculation**: Violations scored as violations / total violations checked
 4. **Local Storage**: Results cached in browser's IndexedDB under `a11y-scores` database
-5. **UI Render**: ReScript frontend renders violations table and score history chart
+5. **UI Render**: AffineScript frontend renders violations table and score history chart
 
 **Code Evidence:**
 - Manifest parser at `tools/browser-extension/manifest.json` declares permissions for `activeTab`, `scripting`, `storage`
@@ -59,7 +59,7 @@ ____
 
 The testing dashboard (`tools/testing-dashboard/`) provides:
 
-1. **Frontend Input**: User enters domain in `tools/testing-dashboard/src/Dashboard.res` (ReScript)
+1. **Frontend Input**: User enters domain in `tools/testing-dashboard/src/Dashboard.res` (AffineScript)
 2. **Scan Dispatch**: Frontend POST to `tools/monitoring-api/` with domain + WCAG level
 3. **Queue**: API stores job in ArangoDB `scanning_queue` collection with status "pending"
 4. **Background Worker**: A Node.js worker (`tools/monitoring-api/src/worker.js`) picks up jobs, spawns Puppeteer, calls axe-core
@@ -104,13 +104,13 @@ The leaderboard has known limitations:
 |===
 | Layer | Technology | Reason
 
-| **Extension UI** | JavaScript (ES6) + TypeScript | Tight coupling to browser APIs; ReScript cannot target extension manifest directly
-| **Frontend (Dashboard)** | ReScript + TEA | Type safety + simple state machine for forms
+| **Extension UI** | JavaScript (ES6) + TypeScript | Tight coupling to browser APIs; AffineScript cannot target extension manifest directly
+| **Frontend (Dashboard)** | AffineScript + TEA | Type safety + simple state machine for forms
 | **API Gateway** | Node.js + Express | Lightweight, good async/await for Puppeteer orchestration
 | **Scanner Core** | Puppeteer + axe-core | Industry standard (used by Lighthouse, WebAIM, Accessibility Checker)
 | **Database** | ArangoDB | Graph + document = flexible metadata + relationship queries
 | **Leaderboard Export** | JSON (static) | Immutable, cacheable, CDN-friendly
-| **Frontend (Leaderboard)** | ReScript | Sortable table, reactive on new data
+| **Frontend (Leaderboard)** | AffineScript | Sortable table, reactive on new data
 |===
 
 ---
@@ -126,7 +126,7 @@ The leaderboard has known limitations:
 | `tools/browser-extension/src/scanner.ts` | axe-core injection and result formatting
 | `tools/browser-extension/src/storage.ts` | IndexedDB schema and persistence layer
 | `tools/testing-dashboard/` | Public web dashboard for URL scanning and leaderboard display
-| `tools/testing-dashboard/src/Dashboard.res` | ReScript TEA app (ReScript → JS)
+| `tools/testing-dashboard/src/Dashboard.res` | AffineScript TEA app (AffineScript → JS)
 | `tools/testing-dashboard/public/leaderboard.schema.json` | JSON schema for leaderboard data
 | `tools/monitoring-api/` | REST API backend for scanning jobs
 | `tools/monitoring-api/src/api.ts` | Express routes for `/scan`, `/results`, `/health`
@@ -149,7 +149,7 @@ The leaderboard has known limitations:
 | **ABI/FFI (Idris2 + Zig)** | Scanner FFI boundary (axe-core → native code if needed in future)
 | Planned for Phase 2: formal verification of WCAG criterion predicates
 
-| **Hyperpolymath Language Policy** | ReScript for dashboard (no TypeScript), Node.js for API (exception: JS ecosystem tooling unavoidable)
+| **Hyperpolymath Language Policy** | AffineScript for dashboard (no TypeScript), Node.js for API (exception: JS ecosystem tooling unavoidable)
 | Compliant; Node.js API transitioning to Deno in Phase 3
 
 | **MPL-2.0 License** | Primary; fallback to MPL-2.0 for browser extension store requirements
