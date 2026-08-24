@@ -2,6 +2,6 @@
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell
 // Ported via Harvard Engine bulk-processor
 
-module Scanner;
+module Arangodb;
 
 // TODO: Complete semantic implementation
