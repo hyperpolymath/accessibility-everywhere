@@ -111,11 +111,6 @@ jobs:
       - name: Run tests
         run: npm test --workspaces --if-present
         continue-on-error: true
-      - name: Upload coverage
-        uses: codecov/codecov-action@0b35c9ecc4f0529d0eb674914510c22f85b196b4 # v7.1.0
-        with:
-          files: coverage/lcov.info
-        continue-on-error: true
   # Security Audit
   security:
     name: Security Audit
